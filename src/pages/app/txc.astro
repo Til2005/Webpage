@@ -134,7 +134,22 @@ import AppLayout from "../../layouts/AppLayout.astro";
     }
   }
 
-  getUser().then(user => renderUser(user));
+  // PKCE: Exchange code from URL before checking session
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (code) {
+    supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+      if (!error && data.session) {
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname);
+        renderUser(data.session.user);
+      } else {
+        getUser().then(user => renderUser(user));
+      }
+    });
+  } else {
+    getUser().then(user => renderUser(user));
+  }
 
   supabase.auth.onAuthStateChange((_event, session) => {
     renderUser(session?.user ?? null);
