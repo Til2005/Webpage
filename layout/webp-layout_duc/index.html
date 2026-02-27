@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Fixed Header</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        // Default font for the site remains Geom
+                        sans: ['Geom Variable', 'Inter', 'sans-serif'],
+                        // New font specifically for the name
+                        lexend: ['Lexend Variable', 'sans-serif'],
+                    },
+                    colors: {
+                        black: '#000000',
+                        white: '#ffffff',
+                    }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* --- CSS STYLES --- */
+        
+        /* Existing Geom Variable Font */
+        @font-face {
+            font-family: 'Geom Variable';
+            src: url('fonts/Geom-VariableFont_wght.woff2') format('woff2'),
+                 url('fonts/Geom-VariableFont_wght.woff') format('woff'),
+                 url('fonts/Geom-VariableFont_wght.ttf') format('truetype');
+            font-weight: 100 900; 
+            font-display: swap;   
+            font-style: normal;
+        }
+
+        /* Lexend Variable Font */
+        @font-face {
+            font-family: 'Lexend Variable';
+            src: url('fonts/Lexend-VariableFont_wght.ttf') format('truetype');
+            font-weight: 100 900;
+            font-display: swap;
+            font-style: normal;
+        }
+
+        body {
+            /* Apply Geom Variable globally with fallback */
+            font-family: 'Geom Variable', sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* 1. Header Hide/Show Animation */
+        .header-hidden {
+            top: -64px !important;
+        }
+
+        /* 2. Dropdown Visibility Animation */
+        .dropdown-menu {
+            transition: visibility 0s linear 0.6s, opacity 0.6s ease; 
+        }
+
+        .dropdown-menu.hidden-menu {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .dropdown-menu.visible-menu {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            /* When opening, visibility is immediate */
+            transition: visibility 0s, opacity 0s; 
+        }
+
+        /* 3. Expanding Menu Item Animation */
+        .menu-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Align content to the right initially */
+            
+            /* Initial State (Hidden/Closed) */
+            max-width: 3.5rem; 
+            min-width: 3.5rem;
+            height: 3.5rem;
+            background-color: transparent;
+            overflow: hidden;
+            border-radius: 9999px;
+            
+            /* Entrance/Exit Animation Props */
+            opacity: 0;
+            transform: translateY(-20px);
+            pointer-events: none; /* No clicks while hidden */
+
+            /* Transitions: 
+               1. max-width (Hover expand)
+               2. background-color (Hover color)
+               3. opacity (Entrance)
+               4. transform (Entrance slide)
+            */
+            transition: 
+                max-width 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
+                background-color 0.3s ease,
+                opacity 0.3s ease,
+                transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Active/Visible State for Items */
+        .dropdown-menu.visible-menu .menu-item {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* --- STAGGERED ANIMATION DELAYS --- */
+        
+        /* OPENING: Top to Bottom (1 -> 8) */
+        .dropdown-menu.visible-menu .menu-item:nth-child(1) { transition-delay: 0s, 0s, 0.05s, 0.05s; }
+        .dropdown-menu.visible-menu .menu-item:nth-child(2) { transition-delay: 0s, 0s, 0.10s, 0.10s; }
+        .dropdown-menu.visible-menu .menu-item:nth-child(3) { transition-delay: 0s, 0s, 0.15s, 0.15s; }
+        .dropdown-menu.visible-menu .menu-item:nth-child(4) { transition-delay: 0s, 0s, 0.20s, 0.20s; }
+        .dropdown-menu.visible-menu .menu-item:nth-child(5) { transition-delay: 0s, 0s, 0.25s, 0.25s; }
+        .dropdown-menu.visible-menu .menu-item:nth-child(6) { transition-delay: 0s, 0s, 0.30s, 0.30s; }
+        .dropdown-menu.visible-menu .menu-item:nth-child(7) { transition-delay: 0s, 0s, 0.35s, 0.35s; }
+        .dropdown-menu.visible-menu .menu-item:nth-child(8) { transition-delay: 0s, 0s, 0.40s, 0.40s; }
+
+        /* CLOSING: Bottom to Top (Reverse 8 -> 1) */
+        .menu-item:nth-child(1) { transition-delay: 0s, 0s, 0.35s, 0.35s; }
+        .menu-item:nth-child(2) { transition-delay: 0s, 0s, 0.30s, 0.30s; }
+        .menu-item:nth-child(3) { transition-delay: 0s, 0s, 0.25s, 0.25s; }
+        .menu-item:nth-child(4) { transition-delay: 0s, 0s, 0.20s, 0.20s; }
+        .menu-item:nth-child(5) { transition-delay: 0s, 0s, 0.15s, 0.15s; }
+        .menu-item:nth-child(6) { transition-delay: 0s, 0s, 0.10s, 0.10s; }
+        .menu-item:nth-child(7) { transition-delay: 0s, 0s, 0.05s, 0.05s; }
+        .menu-item:nth-child(8) { transition-delay: 0s, 0s, 0.00s, 0.00s; }
+
+
+        /* HOVER State: Expand and turn Black */
+        .menu-item:hover {
+            max-width: 25rem; 
+            background-color: #000000;
+        }
+        
+        /* White Ellipse Background for Icons */
+        .menu-icon-bg {
+            position: absolute;
+            right: 0.65rem; 
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2.2rem;
+            height: 2.2rem;
+            background-color: #ffffff;
+            border-radius: 50%;
+            z-index: 5; /* Behind the icon */
+            opacity: 1;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .menu-item:hover .menu-icon-bg {
+            right: calc(100% - 3.0rem); 
+            opacity: 0;
+        }
+
+        /* Icon Animation */
+        .menu-icon-img {
+            position: absolute;
+            right: 0.85rem; /* Centered in the initial circle */
+            width: 1.8rem;
+            height: 1.8rem;
+            object-fit: contain;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: none;
+            z-index: 10;
+        }
+
+        .menu-item:hover .menu-icon-img {
+            right: calc(100% - 2.8rem); 
+            filter: invert(1);
+        }
+
+        /* Text Animation */
+        .menu-text {
+            opacity: 0;
+            color: #ffffff;
+            white-space: nowrap;
+            font-weight: bold;
+            margin-right: 1.5rem; 
+            margin-left: 3rem; 
+            transform: translateX(10px);
+            transition: all 0.4s ease 0.1s; 
+            z-index: 10;
+        }
+
+        .menu-item:hover .menu-text {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- The Fixed Smart Header -->
+    <header id="smartHeader" class="fixed top-0 left-0 w-full h-16 bg-black text-white z-50 
+                                     flex justify-between items-center px-4 md:px-8 
+                                     transition-all duration-300 ease-in-out">
+        
+        <!-- Logo -->
+        <!-- UPDATED: Changed div to anchor tag to link back to main domain -->
+        <a href="https://kimoxabae.de" class="logo text-2xl font-extrabold tracking-wider cursor-pointer text-white no-underline">
+            KIMOXABAE
+        </a>
+
+        <!-- Navigation -->
+        <nav class="relative z-50">
+            <!-- Menu Button -->
+            <button id="dropdownToggle" class="flex items-center justify-center w-[2.2rem] h-[2.2rem] mr-[0.65rem] rounded-full hover:bg-white hover:text-black transition duration-500 group cursor-pointer" aria-label="Menu">
+                <div id="menuIcon" class="w-6 h-6 border-2 border-white rounded-full transition-colors duration-500"></div>
+            </button>
+            
+            <!-- Dropdown Menu Container -->
+            <div id="dropdownMenu" class="dropdown-menu hidden-menu absolute right-0 top-full pt-4 flex flex-col items-end gap-2 z-50">
+                
+                <!-- 1. Illustration -->
+                <!-- UPDATED: Linked to illustration_storyboard -->
+                <a href="https://kimoxabae.de/illustration_storyboard" class="menu-item">
+                    <span class="menu-text">Illustration - Storyboard</span>
+                    <div class="menu-icon-bg"></div>
+                    <img src="icons/Illustration, Storyboardxhdpi.png" alt="Illustration" class="menu-icon-img">
+                </a>
+
+                <!-- 2. Animation -->
+                <!-- UPDATED: Linked to animation -->
+                <a href="https://kimoxabae.de/animation" class="menu-item">
+                    <span class="menu-text">Animation</span>
+                    <div class="menu-icon-bg"></div>
+                    <img src="icons/Animationxhdpi.png" alt="Animation" class="menu-icon-img">
+                </a>
+
+                <!-- 3. 3D/CGI -->
+                <!-- UPDATED: Linked to 3d_cgi -->
+                <a href="https://kimoxabae.de/3d_cgi" class="menu-item">
+                    <span class="menu-text">3D/CGI</span>
+                    <div class="menu-icon-bg"></div>
+                    <img src="icons/3D, CGIxhdpi.png" alt="3D/CGI" class="menu-icon-img">
+                </a>
+
+                <!-- 4. Web Design -->
+                <!-- UPDATED: Linked to web_design -->
+                <a href="https://kimoxabae.de/web_design" class="menu-item">
+                    <span class="menu-text">Web Design</span>
+                    <div class="menu-icon-bg"></div>
+                    <img src="icons/Web Designxhdpi.png" alt="Web Design" class="menu-icon-img">
+                </a>
+
+                <!-- 5. App Development -->
+                <!-- UPDATED: Linked to app_development -->
+                <a href="https://kimoxabae.de/app_development" class="menu-item">
+                    <span class="menu-text">App Development</span>
+                    <div class="menu-icon-bg"></div>
+                    <img src="icons/App Developxhdpi.png" alt="App Development" class="menu-icon-img">
+                </a>
+
+                <!-- 6. Photography -->
+                <!-- UPDATED: Linked to photography -->
+                <a href="https://kimoxabae.de/photography" class="menu-item">
+                    <span class="menu-text">Photography</span>
+                    <div class="menu-icon-bg"></div>
+                    <img src="icons/Photographyxhdpi.png" alt="Photography" class="menu-icon-img">
+                </a>
+
+                <!-- 7. Music -->
+                <!-- UPDATED: Linked to music -->
+                <a href="https://kimoxabae.de/music" class="menu-item">
+                    <span class="menu-text">Music</span>
+                    <div class="menu-icon-bg"></div>
+                    <img src="icons/Musikxhdpi.png" alt="Music" class="menu-icon-img">
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- SECTION 1: Head Title Picture / Hero Image -->
+    <div id="hero-section" class="relative w-full h-screen z-0 will-change-transform">
+        <!-- Image -->
+        <img src="images/mainpage_headline.jpeg" alt="Black and white architectural sketches and portrait" class="w-full h-full object-cover block">
+        
+        <!-- Center Overlay Text -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-4">
+            <!-- Dynamic Greeting -->
+            <h2 id="dynamicGreeting" class="text-3xl md:text-5xl lg:text-6xl font-light text-white mb-2 md:mb-4 text-center transition-all duration-500 ease-in-out transform">Hello, I'm</h2>
+            <!-- Name -->
+            <h1 class="font-lexend text-4xl md:text-7xl lg:text-8xl font-medium tracking-wider text-white text-center uppercase">Minh Đức</h1>
+        </div>
+    </div>
+
+    <!-- WRAPPER for Parallax Content -->
+    <div class="relative z-10 bg-white">
+        
+        <!-- SECTION 2: Main Content + Grid -->
+        <main id="main-content" class="h-screen w-full flex flex-col items-center justify-center px-8 box-border relative">
+            
+            <!-- Welcome Text (Top of Section 2) -->
+            <div class="text-center shrink-0 mb-10 z-20">
+                <h1 id="welcome-text" class="text-4xl font-bold text-black pb-4 inline-block transition-all duration-300 ease-out opacity-0 translate-y-10">hellu there...</h1>
+            </div>
+
+            <!-- Random Rectangles Grid -->
+            <div class="w-full flex items-center justify-center">
+                <div id="grid-container" class="relative w-full max-w-[min(90vw,70vh)] aspect-square bg-transparent">
+                    <!-- Javascript will inject 8 absolute divs here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Impressum Footer -->
+        <footer id="footer" class="w-full py-12 px-4 bg-white">
+            <div class="max-w-4xl mx-auto text-center space-y-2">
+                <h3 class="text-xl font-bold uppercase mb-6 tracking-widest">Impressum</h3>
+                <p class="text-black font-medium">Name: Minh Đức Phạm</p>
+                <p class="text-black">Address: Nuremberg, Germany</p>
+                <p class="text-black">Email: <a href="mailto:kimoxabae@web.de" class="hover:underline">kimoxabae@web.de</a></p>
+                <p class="text-sm text-gray-500 mt-8 pt-4 border-t border-gray-200 max-w-lg mx-auto">
+                    This is a personal portfolio website. All artwork and content are created by the artist and may not be used without permission.
+                </p>
+            </div>
+        </footer>
+    
+    </div> <!-- End of Content Wrapper -->
+
+    <!-- --- JAVASCRIPT --- -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const header = document.getElementById('smartHeader');
+            const dropdownToggle = document.getElementById('dropdownToggle');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            const menuIcon = document.getElementById('menuIcon');
+            const nav = document.querySelector('nav'); 
+            const dynamicGreeting = document.getElementById('dynamicGreeting');
+            const heroSection = document.getElementById('hero-section'); 
+            const welcomeText = document.getElementById('welcome-text'); 
+            const gridContainer = document.getElementById('grid-container'); 
+            
+            // Variables
+            const headerHeight = 64; 
+            let lastScrollTop = 0;
+            let isDropdownOpen = false;
+            let closeTimeout;
+            let isWelcomeChanged = false; 
+
+            // --- RANDOM GRID GENERATOR WITH INTERACTION ---
+            if (gridContainer) {
+                const gridSize = 4; // 4x4 Grid
+                const numDynamicRectangles = 7; 
+                const numBlackRectangles = 2;
+                
+                // Variables for Auto-Reorganization
+                let isHoveringGrid = false;
+                
+                // UPDATED: Converted simple icon array to object array with Names and Links
+                const gridData = [
+                    { 
+                        src: "icons/Illustration, Storyboardxhdpi.png", 
+                        name: "Illustration", 
+                        link: "https://kimoxabae.de/illustration_storyboard" 
+                    },
+                    { 
+                        src: "icons/Animationxhdpi.png", 
+                        name: "Animation", 
+                        link: "https://kimoxabae.de/animation" 
+                    },
+                    { 
+                        src: "icons/3D, CGIxhdpi.png", 
+                        name: "3D/CGI", 
+                        link: "https://kimoxabae.de/3d_cgi" 
+                    },
+                    { 
+                        src: "icons/Web Designxhdpi.png", 
+                        name: "Web Design", 
+                        link: "https://kimoxabae.de/web_design" 
+                    },
+                    { 
+                        src: "icons/App Developxhdpi.png", 
+                        name: "App Development", 
+                        link: "https://kimoxabae.de/app_development" 
+                    },
+                    { 
+                        src: "icons/Photographyxhdpi.png", 
+                        name: "Photography", 
+                        link: "https://kimoxabae.de/photography" 
+                    },
+                    { 
+                        src: "icons/Musikxhdpi.png", 
+                        name: "Music", 
+                        link: "https://kimoxabae.de/music" 
+                    }
+                ];
+
+                // State to hold item data
+                let items = [];
+                let initialItems = []; // Store initial state for reset
+
+                // Helper: Check collision between two rect objects
+                const checkCollision = (rect1, rect2) => {
+                    // Simple AABB collision
+                    return (
+                        rect1.x < rect2.x + rect2.w &&
+                        rect1.x + rect1.w > rect2.x &&
+                        rect1.y < rect2.y + rect2.h &&
+                        rect1.y + rect1.h > rect2.y
+                    );
+                };
+
+                // Helper: Check if rect collides with ANY item in list
+                const hasAnyCollision = (rect, list, ignoreId = null) => {
+                    for (let i = 0; i < list.length; i++) {
+                        if (list[i].id === ignoreId) continue;
+                        if (checkCollision(rect, list[i])) return true;
+                    }
+                    return false;
+                };
+
+                // Helper: Check bounds
+                const inBounds = (rect) => {
+                    return rect.x >= 0 && rect.y >= 0 && rect.x + rect.w <= gridSize && rect.y + rect.h <= gridSize;
+                };
+
+                // REUSABLE PLACEMENT LOGIC
+                const assignRandomPositions = (targetItems) => {
+                    // We need to place items into the grid without overlapping.
+                    // Separate AboutMe from others to prioritize it
+                    
+                    // Reset positions/sizes for calculation
+                    // About Me -> 2x2, others -> 1x1
+                    // We effectively "clear" the grid by building a list of placed items
+                    let placedItems = [];
+
+                    // 1. Place "About Me" (2x2)
+                    const aboutItem = targetItems.find(i => i.isAboutMe);
+                    if (aboutItem) {
+                        aboutItem.w = 2; 
+                        aboutItem.h = 2;
+                        let placed = false;
+                        while (!placed) {
+                            const x = Math.floor(Math.random() * (gridSize - 1)); // 0-2
+                            const y = Math.floor(Math.random() * (gridSize - 1)); // 0-2
+                            
+                            // Prevent placement in the exact middle (1,1)
+                            if (x === 1 && y === 1) continue;
+
+                            aboutItem.x = x;
+                            aboutItem.y = y;
+                            
+                            // Check collision (should be none as it's first, but good practice)
+                            if (!hasAnyCollision(aboutItem, placedItems)) {
+                                placedItems.push(aboutItem);
+                                placed = true;
+                            }
+                        }
+                    }
+
+                    // 2. Place Rest (1x1)
+                    const otherItems = targetItems.filter(i => !i.isAboutMe);
+                    for (let item of otherItems) {
+                        item.w = 1;
+                        item.h = 1;
+                        let placed = false;
+                        let attempts = 0;
+                        while (!placed && attempts < 1000) {
+                            const x = Math.floor(Math.random() * gridSize);
+                            const y = Math.floor(Math.random() * gridSize);
+                            
+                            item.x = x;
+                            item.y = y;
+                            
+                            if (!hasAnyCollision(item, placedItems)) {
+                                placedItems.push(item);
+                                placed = true;
+                            }
+                            attempts++;
+                        }
+                    }
+                };
+
+                // --- INITIALIZATION ---
+                
+                // create objects first
+                // About Me
+                items.push({ 
+                    x:0, y:0, w: 2, h: 2, 
+                    isAboutMe: true, 
+                    content: "About Me",
+                    id: "about"
+                });
+                
+                // Icons
+                for (let i = 0; i < numDynamicRectangles; i++) {
+                    // UPDATED: Use gridData object instead of just icon path
+                    const data = gridData[i % gridData.length];
+                    items.push({ 
+                        x:0, y:0, w: 1, h: 1, 
+                        icon: data.src, 
+                        name: data.name,
+                        link: data.link,
+                        id: `icon-${i}` 
+                    });
+                }
+                
+                // Black Rects
+                for (let i = 0; i < numBlackRectangles; i++) {
+                    items.push({ x:0, y:0, w: 1, h: 1, isBlack: true, id: `black-${i}` });
+                }
+
+                // Initial Placement
+                assignRandomPositions(items);
+                
+                // Save initial state deep copy
+                initialItems = JSON.parse(JSON.stringify(items));
+
+                // Create DOM Elements
+                items.forEach((item, index) => {
+                    const el = document.createElement('div');
+                    el.id = `grid-item-${item.id}`; 
+                    
+                    let baseClasses = "absolute rounded-[2rem] flex items-center justify-center overflow-hidden transition-all duration-300 cursor-pointer"; 
+                    if (item.isBlack) {
+                        el.className = `${baseClasses} bg-black`;
+                    } else {
+                        // Added 'group' to enable group-hover effects on children
+                        el.className = `${baseClasses} bg-white border-2 border-black group`;
+                    }
+                    
+                    // Style is applied by render() immediately after
+                    el.style.zIndex = item.isAboutMe ? 20 : 10;
+
+                    if (item.isAboutMe) {
+                        const span = document.createElement('span');
+                        span.textContent = item.content;
+                        span.className = "font-lexend font-bold text-xl uppercase tracking-widest text-black";
+                        el.appendChild(span);
+                    } else if (!item.isBlack) {
+                        // Container for content to manage layout
+                        const contentWrapper = document.createElement('div');
+                        contentWrapper.className = "relative w-full h-full flex items-center justify-center";
+
+                        // Icon
+                        const img = document.createElement('img');
+                        img.src = item.icon;
+                        // Added group-hover transition to maybe move up slightly or just stay centered
+                        img.className = "w-1/2 h-1/2 object-contain transition-all duration-300 group-hover:-translate-y-4";
+                        contentWrapper.appendChild(img);
+
+                        // NEW: Category Name Text
+                        const text = document.createElement('div');
+                        text.textContent = item.name;
+                        // Absolute positioning at bottom, initially hidden (translate down + opacity 0)
+                        // On group hover: slide up + fade in
+                        text.className = "absolute bottom-6 left-0 w-full text-center font-lexend font-bold text-black text-sm opacity-0 translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0";
+                        contentWrapper.appendChild(text);
+
+                        el.appendChild(contentWrapper);
+
+                        // Add Click Listener for Navigation
+                        el.addEventListener('click', () => {
+                            if (item.link) {
+                                window.location.href = item.link;
+                            }
+                        });
+                    }
+
+                    // Event Listeners for Interaction
+                    el.addEventListener('mouseenter', () => handleHover(item.id));
+                    
+                    gridContainer.appendChild(el);
+                });
+
+                // Track Hover state to pause reorganization
+                gridContainer.addEventListener('mouseenter', () => { isHoveringGrid = true; });
+                gridContainer.addEventListener('mouseleave', () => { isHoveringGrid = false; });
+
+                // Render Function (Updates positions based on 'items' state)
+                const render = (activeId = null) => {
+                    // Find Original Active Item Position for distance calculations
+                    let activeOrigin = null;
+                    if (activeId !== null) {
+                        activeOrigin = initialItems.find(i => i.id === activeId);
+                    }
+
+                    items.forEach((item) => {
+                        const el = document.getElementById(`grid-item-${item.id}`);
+                        if (el) {
+                            const gap = 16;
+                            const halfGap = gap / 2;
+                            
+                            const targetLeft = `calc(${(item.x / gridSize) * 100}% + ${halfGap}px)`;
+                            const targetTop = `calc(${(item.y / gridSize) * 100}% + ${halfGap}px)`;
+                            const targetWidth = `calc(${(item.w / gridSize) * 100}% - ${gap}px)`;
+                            const targetHeight = `calc(${(item.h / gridSize) * 100}% - ${gap}px)`;
+
+                            // Manhattan Movement Logic
+                            // If re-organizing (activeId is null), we handle transitions differently?
+                            // No, just use standard transition logic.
+                            // However, if re-organizing, origin is previous position.
+                            
+                            // Note: 'initialItems' holds the state BEFORE the current interaction or BEFORE the shuffle.
+                            const origin = initialItems.find(i => i.id === item.id) || item;
+                            const dx = item.x - origin.x;
+                            const dy = item.y - origin.y;
+                            
+                            let xDelay = 0;
+                            let yDelay = 0;
+                            let sizeDelay = 0;
+                            const duration = 0.5;
+
+                            // Calculate Sequence Delay
+                            let sequenceDelay = 0;
+                            if (activeOrigin && item.id !== activeId) {
+                                const dist = Math.abs(origin.x - activeOrigin.x) + Math.abs(origin.y - activeOrigin.y);
+                                sequenceDelay = Math.max(0, (4 - dist) * 0.05); 
+                            }
+
+                            if (activeId && item.id === activeId) {
+                                // Active moves last
+                                const activeDelay = 0.5;
+                                xDelay = activeDelay;
+                                yDelay = activeDelay;
+                                sizeDelay = activeDelay;
+                            } else {
+                                // Pushed Items / Reorganization
+                                // Heuristic: Check horizontal blockage
+                                const isBlockedHorizontally = initialItems.some(obs => 
+                                    obs.id !== item.id && 
+                                    obs.x === item.x && 
+                                    obs.y === origin.y 
+                                );
+
+                                if (dx !== 0 && dy !== 0) {
+                                    if (isBlockedHorizontally) {
+                                        yDelay = sequenceDelay;
+                                        xDelay = sequenceDelay + duration;
+                                    } else {
+                                        xDelay = sequenceDelay;
+                                        yDelay = sequenceDelay + duration;
+                                    }
+                                } else {
+                                    xDelay = sequenceDelay;
+                                    yDelay = sequenceDelay;
+                                }
+                            }
+
+                            el.style.transition = `
+                                left ${duration}s ease-in-out ${xDelay}s, 
+                                top ${duration}s ease-in-out ${yDelay}s, 
+                                width ${duration}s ease-in-out ${sizeDelay}s, 
+                                height ${duration}s ease-in-out ${sizeDelay}s
+                            `;
+                            
+                            el.style.left = targetLeft;
+                            el.style.top = targetTop;
+                            el.style.width = targetWidth;
+                            el.style.height = targetHeight;
+                            el.style.zIndex = (item.w > (item.isAboutMe ? 2 : 1)) ? 50 : 10;
+                        }
+                    });
+                };
+
+                const handleHover = (activeId) => {
+                    // Reset to initial state logic
+                    let tempItems = JSON.parse(JSON.stringify(initialItems));
+                    const activeItem = tempItems.find(i => i.id === activeId);
+
+                    // Allow black rectangles to expand. Only prevent About Me (already 2x2)
+                    if (activeItem.isAboutMe) return;
+
+                    // 1. Expand Active Item (Priority 1)
+                    const ox = activeItem.x;
+                    const oy = activeItem.y;
+                    activeItem.w = 2;
+                    activeItem.h = 2;
+
+                    // Strict Overlap Logic
+                    let candidates = [];
+                    const possibleX = [ox - 1, ox];
+                    const possibleY = [oy - 1, oy];
+
+                    for (let px of possibleX) {
+                        for (let py of possibleY) {
+                            if (px >= 0 && py >= 0 && px + 2 <= gridSize && py + 2 <= gridSize) {
+                                let score = 0;
+                                if (oy < 2) { if (py > 0) score += 10; } 
+                                else { if (py < 2) score += 10; } 
+                                if (px !== ox) score += 5; 
+
+                                candidates.push({x: px, y: py, score: score});
+                            }
+                        }
+                    }
+
+                    candidates.sort((a, b) => a.score - b.score);
+
+                    if (candidates.length > 0) {
+                        activeItem.x = candidates[0].x;
+                        activeItem.y = candidates[0].y;
+                    } else {
+                        activeItem.w = 1;
+                        activeItem.h = 1;
+                    }
+
+                    // 2. Prepare Solver Data
+                    let occupied = Array(gridSize).fill().map(() => Array(gridSize).fill(false));
+                    
+                    for(let x=activeItem.x; x<activeItem.x+activeItem.w; x++) {
+                        for(let y=activeItem.y; y<activeItem.y+activeItem.h; y++) occupied[x][y] = true;
+                    }
+
+                    // 3. Place "About Me" (Priority 2)
+                    const aboutMe = tempItems.find(i => i.isAboutMe);
+                    const origAbout = initialItems.find(i => i.id === 'about');
+                    
+                    let bestAboutPos = null;
+                    let minAboutDist = Infinity;
+
+                    for(let x=0; x<=gridSize-2; x++) {
+                        for(let y=0; y<=gridSize-2; y++) {
+                            let overlap = false;
+                            for(let i=0; i<2; i++) for(let j=0; j<2; j++) if(occupied[x+i][y+j]) overlap = true;
+                            
+                            if (!overlap) {
+                                const dist = Math.abs(x - origAbout.x) + Math.abs(y - origAbout.y);
+                                const isOrthogonal = (x === origAbout.x || y === origAbout.y);
+                                
+                                if (dist <= 1 && isOrthogonal) {
+                                    if (dist < minAboutDist) {
+                                        minAboutDist = dist;
+                                        bestAboutPos = {x, y};
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (!bestAboutPos) {
+                         for(let x=0; x<=gridSize-2; x++) {
+                            for(let y=0; y<=gridSize-2; y++) {
+                                let overlap = false;
+                                for(let i=0; i<2; i++) for(let j=0; j<2; j++) if(occupied[x+i][y+j]) overlap = true;
+                                if (!overlap) { bestAboutPos = {x,y}; break; }
+                            }
+                            if (bestAboutPos) break;
+                        }
+                    }
+
+                    if (bestAboutPos) {
+                        aboutMe.x = bestAboutPos.x;
+                        aboutMe.y = bestAboutPos.y;
+                        for(let i=0; i<2; i++) for(let j=0; j<2; j++) occupied[aboutMe.x+i][aboutMe.y+j] = true;
+                    }
+
+                    // 4. Place 1x1 Items (Constraint Solver)
+                    const floatingItems = tempItems.filter(i => !i.isAboutMe && i.id !== activeId);
+                    
+                    let availableSlots = [];
+                    for(let x=0; x<gridSize; x++) {
+                        for(let y=0; y<gridSize; y++) {
+                            if (!occupied[x][y]) availableSlots.push({x, y});
+                        }
+                    }
+
+                    floatingItems.forEach(item => {
+                        const orig = initialItems.find(i => i.id === item.id);
+                        item.candidates = availableSlots.filter(slot => {
+                            const dx = Math.abs(slot.x - orig.x);
+                            const dy = Math.abs(slot.y - orig.y);
+                            return (dx + dy) <= 1; 
+                        });
+                        item.candidates.sort((a,b) => {
+                            const da = Math.abs(a.x - orig.x) + Math.abs(a.y - orig.y);
+                            const db = Math.abs(b.x - orig.x) + Math.abs(b.y - orig.y);
+                            return da - db;
+                        });
+                    });
+
+                    floatingItems.sort((a, b) => a.candidates.length - b.candidates.length);
+
+                    let usedSlots = new Set();
+
+                    floatingItems.forEach(item => {
+                        let assigned = false;
+                        for (let cand of item.candidates) {
+                            const slotIndex = availableSlots.indexOf(cand);
+                            if (slotIndex !== -1 && !usedSlots.has(slotIndex)) {
+                                item.x = cand.x;
+                                item.y = cand.y;
+                                usedSlots.add(slotIndex);
+                                assigned = true;
+                                break;
+                            }
+                        }
+
+                        if (!assigned) {
+                            for (let i = 0; i < availableSlots.length; i++) {
+                                if (!usedSlots.has(i)) {
+                                    item.x = availableSlots[i].x;
+                                    item.y = availableSlots[i].y;
+                                    usedSlots.add(i);
+                                    assigned = true;
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+                    items = tempItems;
+                    render(activeId);
+                };
+
+                // Initial Render
+                render();
+
+                // --- AUTO REORGANIZATION (Every 5 Seconds) ---
+                setInterval(() => {
+                    // Only shuffle if user is NOT hovering (avoids jarring jumps while interacting)
+                    if (!isHoveringGrid) {
+                        // 1. Assign new random positions
+                        assignRandomPositions(items);
+                        
+                        // 2. Update initialItems to match this new base state
+                        // (Important: Logic needs initialItems to be the 'resting' state for movement calcs)
+                        initialItems = JSON.parse(JSON.stringify(items));
+                        
+                        // 3. Render (No active item)
+                        render(null);
+                    }
+                }, 5000);
+            }
+
+            // --- INITIAL REVEAL LOGIC ---
+            if (welcomeText) {
+                setTimeout(() => {
+                    if (!isWelcomeChanged) {
+                        welcomeText.classList.remove('opacity-0', 'translate-y-10');
+                    }
+                }, 1000);
+            }
+
+            // --- KEYBOARD NAVIGATION LOGIC ---
+            window.addEventListener('keydown', (e) => {
+                if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
+                    e.preventDefault(); 
+
+                    const getOffset = (id) => {
+                        const el = document.getElementById(id);
+                        if (!el) return 0;
+                        const rect = el.getBoundingClientRect();
+                        return rect.top + window.scrollY;
+                    };
+
+                    const targets = [
+                        0, 
+                        getOffset('main-content'),
+                        getOffset('footer')
+                    ].sort((a, b) => a - b);
+
+                    const currentScroll = window.scrollY;
+                    const threshold = 10; 
+
+                    if (e.key === 'ArrowDown') {
+                        const nextTarget = targets.find(t => t > currentScroll + threshold);
+                        if (nextTarget !== undefined) {
+                            window.scrollTo({ top: nextTarget, behavior: 'smooth' });
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        const prevTarget = [...targets].reverse().find(t => t < currentScroll - threshold);
+                        if (prevTarget !== undefined) {
+                            window.scrollTo({ top: prevTarget, behavior: 'smooth' });
+                        }
+                    }
+                }
+            });
+
+            // --- MULTI-LANGUAGE GREETING LOGIC ---
+            const greetings = [
+                "Hello, I'm", "Hallo, ich bin", "Xin chào, tôi là", "Привет, я", "Hola, soy", "Bonjour, je suis"
+            ];
+            let greetingIndex = 0;
+
+            if (dynamicGreeting) {
+                setInterval(() => {
+                    dynamicGreeting.classList.add('opacity-0', '-translate-y-4');
+                    setTimeout(() => {
+                        greetingIndex = (greetingIndex + 1) % greetings.length;
+                        dynamicGreeting.textContent = greetings[greetingIndex];
+                        dynamicGreeting.classList.remove('transition-all', 'duration-500'); 
+                        dynamicGreeting.classList.remove('-translate-y-4'); 
+                        dynamicGreeting.classList.add('translate-y-4'); 
+                        void dynamicGreeting.offsetWidth; 
+                        dynamicGreeting.classList.add('transition-all', 'duration-500');
+                        dynamicGreeting.classList.remove('translate-y-4', 'opacity-0'); 
+                    }, 500); 
+                }, 2000); 
+            }
+
+            // --- DROPDOWN LOGIC ---
+            const openDropdown = () => {
+                if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
+                if (!isDropdownOpen) {
+                    isDropdownOpen = true;
+                    dropdownMenu.classList.remove('hidden-menu');
+                    dropdownMenu.classList.add('visible-menu');
+                    if(menuIcon) menuIcon.classList.add('bg-white');
+                }
+            };
+
+            const closeDropdown = () => {
+                closeTimeout = setTimeout(() => {
+                    if (isDropdownOpen) {
+                        isDropdownOpen = false;
+                        dropdownMenu.classList.remove('visible-menu');
+                        dropdownMenu.classList.add('hidden-menu');
+                        if(menuIcon) menuIcon.classList.remove('bg-white');
+                    }
+                }, 300);
+            };
+
+            const toggleDropdown = () => {
+                if (isDropdownOpen) {
+                    if (closeTimeout) clearTimeout(closeTimeout);
+                    isDropdownOpen = false;
+                    dropdownMenu.classList.remove('visible-menu');
+                    dropdownMenu.classList.add('hidden-menu');
+                    if(menuIcon) menuIcon.classList.remove('bg-white');
+                } else {
+                    openDropdown();
+                }
+            };
+
+            if (nav) {
+                nav.addEventListener('mouseenter', openDropdown);
+                nav.addEventListener('mouseleave', closeDropdown);
+            }
+
+            if (dropdownToggle) {
+                dropdownToggle.addEventListener('click', (event) => {
+                    event.stopPropagation(); 
+                    toggleDropdown();
+                });
+            }
+
+            document.addEventListener('click', (event) => {
+                if (isDropdownOpen && !header.contains(event.target)) {
+                    if (closeTimeout) clearTimeout(closeTimeout);
+                    isDropdownOpen = false;
+                    dropdownMenu.classList.remove('visible-menu');
+                    dropdownMenu.classList.add('hidden-menu');
+                    if(menuIcon) menuIcon.classList.remove('bg-white');
+                }
+            });
+
+            // --- SCROLL LOGIC ---
+            const hideHeader = () => { header.classList.add('header-hidden'); };
+            const showHeader = () => { header.classList.remove('header-hidden'); };
+
+            window.addEventListener('scroll', () => {
+                const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+                
+                if (heroSection) heroSection.style.transform = `translateY(${currentScrollTop * 0.5}px)`;
+
+                if (welcomeText) {
+                    const textPosition = welcomeText.getBoundingClientRect().top;
+                    const triggerPoint = window.innerHeight * 0.4; 
+                    if (textPosition < triggerPoint && !isWelcomeChanged) {
+                        isWelcomeChanged = true; 
+                        welcomeText.classList.add('opacity-0'); 
+                        setTimeout(() => {
+                            welcomeText.textContent = "Welcome to my website.";
+                            welcomeText.classList.remove('opacity-0'); 
+                        }, 300); 
+                    }
+                }
+
+                if (currentScrollTop > headerHeight * 2) { 
+                    if (currentScrollTop > lastScrollTop) {
+                        hideHeader();
+                        if(isDropdownOpen) {
+                             if (closeTimeout) clearTimeout(closeTimeout);
+                             isDropdownOpen = false;
+                             dropdownMenu.classList.remove('visible-menu');
+                             dropdownMenu.classList.add('hidden-menu');
+                             if(menuIcon) menuIcon.classList.remove('bg-white');
+                        }
+                    } else { showHeader(); }
+                } else { showHeader(); }
+                lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
+            });
+
+            window.addEventListener('mousemove', (event) => {
+                if (event.clientY < 100) {
+                    if (header.classList.contains('header-hidden') && window.scrollY > headerHeight) showHeader();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

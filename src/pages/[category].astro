@@ -1,0 +1,26 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import AppLauncher from "../components/AppLauncher/AppLauncher.astro";
+import { categories } from "../data/categories";
+
+export function getStaticPaths() {
+  return categories.map((cat) => ({
+    params: { category: cat.slug },
+    props: { category: cat },
+  }));
+}
+
+const { category } = Astro.props;
+---
+
+<BaseLayout title={`${category.name} — Til Sander`}>
+  <Header />
+  <main id="main" class="pt-24 px-4 min-h-screen flex flex-col items-center justify-center">
+    <h1 class="text-4xl md:text-6xl font-bold uppercase tracking-wider mb-8">
+      {category.name}
+    </h1>
+    <p class="text-lg text-[var(--color-muted)]">Inhalte folgen in Kuerze.</p>
+  </main>
+  <AppLauncher />
+</BaseLayout>

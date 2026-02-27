@@ -1,0 +1,60 @@
+---
+interface ColorPreset {
+  id: string;
+  color: string;
+  label: string;
+}
+
+const colors: ColorPreset[] = [
+  { id: "white", color: "#ffffff", label: "Weiß" },
+  { id: "black", color: "#000000", label: "Schwarz" },
+  { id: "blue", color: "#3b82f6", label: "Blau" },
+  { id: "red", color: "#ef4444", label: "Rot" },
+  { id: "yellow", color: "#eab308", label: "Gelb" },
+  { id: "green", color: "#22c55e", label: "Grün" },
+  { id: "purple", color: "#a855f7", label: "Lila" },
+  { id: "orange", color: "#f97316", label: "Orange" },
+];
+---
+
+<div class="txfe-color-picker">
+  <label class="block text-sm font-medium mb-3" data-label-de="Farbe" data-label-en="Color">
+    Farbe
+  </label>
+  <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Textfarbe">
+    {colors.map((c, index) => (
+      <button
+        class:list={[
+          "txfe-color-btn w-8 h-8 rounded-full border-2 transition-all",
+          index === 0 ? "ring-2 ring-offset-2 ring-[var(--color-fg)]" : ""
+        ]}
+        style={`background-color: ${c.color}; border-color: ${c.color === '#ffffff' ? 'var(--color-border)' : c.color}`}
+        role="radio"
+        aria-checked={index === 0 ? "true" : "false"}
+        aria-label={c.label}
+        data-color={c.color}
+        data-color-id={c.id}
+      />
+    ))}
+  </div>
+</div>
+
+<style>
+  .txfe-color-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .txfe-color-btn:focus-visible {
+    outline: none;
+    ring: 2px;
+    ring-offset: 2px;
+  }
+
+  [data-theme="dark"] .txfe-color-btn[data-color-id="white"] {
+    border-color: var(--color-border);
+  }
+
+  [data-theme="dark"] .txfe-color-btn[data-color-id="black"] {
+    border-color: var(--color-muted);
+  }
+</style>

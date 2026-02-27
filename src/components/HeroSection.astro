@@ -1,0 +1,1762 @@
+---
+import { translations } from "../data/i18n";
+const t = translations.de;
+---
+
+<section class="relative w-full h-screen flex flex-col items-center justify-center bg-[var(--color-bg)] overflow-hidden pb-24">
+  <!-- Text container wrapper for all hero texts -->
+  <div class="relative h-32 md:h-44 lg:h-56 w-screen">
+    <!-- Original Til Sander text -->
+    <div id="heroTextTil" class="absolute inset-0 transition-all duration-500 ease-out">
+      <p class="absolute top-0 left-1/2 -translate-x-1/2 text-lg md:text-2xl font-light tracking-wide" data-i18n="heroGreeting">
+        {t.heroGreeting}
+      </p>
+      <h1 class="absolute top-7 md:top-10 lg:top-12 left-1/2 -translate-x-1/2 text-5xl md:text-7xl lg:text-9xl font-bold tracking-tight whitespace-nowrap">
+        {t.heroName}
+      </h1>
+    </div>
+
+    <!-- TXP text (hidden initially) -->
+    <div id="heroTextTXP" class="absolute inset-0 opacity-0 transition-all duration-500 ease-out pointer-events-none">
+      <p class="absolute top-0 left-1/2 -translate-x-1/2 text-lg md:text-2xl font-light tracking-wide">
+        Hallo, ich bin
+      </p>
+      <h1 class="absolute top-7 md:top-10 lg:top-12 left-1/2 -translate-x-1/2 text-5xl md:text-7xl lg:text-9xl font-bold tracking-tight whitespace-nowrap">
+        TXP
+      </h1>
+    </div>
+
+    <!-- TXP final text (hidden initially) -->
+    <div id="heroTextFinal" class="absolute inset-0 opacity-0 transition-all duration-500 ease-out pointer-events-none">
+      <p class="absolute top-0 left-1/2 -translate-x-1/2 text-lg md:text-2xl font-light tracking-wide">
+        Ich wurde von Til entwickelt und ohne mich läuft hier gar nichts.
+      </p>
+      <h1 class="absolute top-7 md:top-10 lg:top-12 left-1/2 -translate-x-1/2 text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight whitespace-nowrap">
+        Schön dich kennenzulernen!
+      </h1>
+    </div>
+
+    <!-- TXP runner text (hidden initially) -->
+    <div id="heroTextRunner" class="absolute inset-0 opacity-0 transition-all duration-500 ease-out pointer-events-none">
+      <p class="absolute top-0 left-1/2 -translate-x-1/2 text-lg md:text-2xl font-light tracking-wide">
+        Ich hab einen Termin!
+      </p>
+      <h1 class="absolute top-7 md:top-10 lg:top-12 left-1/2 -translate-x-1/2 text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight whitespace-nowrap">
+        Hilf mir den Ort zu erreichen!
+      </h1>
+    </div>
+
+    <!-- TXP jump hint text (hidden initially) -->
+    <div id="heroTextJump" class="absolute inset-0 opacity-0 transition-all duration-500 ease-out pointer-events-none">
+      <p class="absolute top-0 left-1/2 -translate-x-1/2 text-lg md:text-2xl font-light tracking-wide">
+        Springe mit der
+      </p>
+      <h1 class="absolute top-7 md:top-10 lg:top-12 left-1/2 -translate-x-1/2 text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight whitespace-nowrap">
+        Leertaste
+      </h1>
+    </div>
+
+    <!-- TXP score text (hidden initially) -->
+    <div id="heroTextScore" class="absolute inset-0 opacity-0 transition-all duration-500 ease-out pointer-events-none">
+      <p class="absolute top-0 left-1/2 -translate-x-1/2 text-lg md:text-2xl font-light tracking-wide">
+        Deine Punktzahl
+      </p>
+      <h1 id="scoreDisplay" class="absolute top-7 md:top-10 lg:top-12 left-1/2 -translate-x-1/2 text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight whitespace-nowrap">
+        0001
+      </h1>
+    </div>
+  </div>
+
+  <!-- TXP Platform (fixed position under title) -->
+  <div id="txpPlatformContainer" class="absolute left-1/2 -translate-x-1/2 pointer-events-none overflow-visible" style="top: calc(50% + 18rem);">
+    <div id="txpPlatform" class="w-28 md:w-36 h-2 bg-[var(--color-fg)] transform scale-x-0 transition-transform duration-300 ease-out origin-center"></div>
+    <!-- Runner ground (hidden initially) -->
+    <div id="txpRunnerGround" class="absolute top-0 left-0 h-2 bg-[var(--color-fg)] opacity-0" style="width: 300vw; transform: translateX(-50vw);"></div>
+  </div>
+
+  <!-- TXP Character (flies from button to platform) -->
+  <div id="txpCharacter" class="fixed pointer-events-none opacity-0 z-[60]" style="width: 90px; height: 90px;">
+    <img id="txpSprite" src="" alt="" class="txp-sprite w-full h-full object-contain transition-transform duration-300" />
+    <!-- Click me hint -->
+    <span id="txpClickHint" class="absolute left-full top-1/2 -translate-y-1/2 ml-2 text-sm font-medium whitespace-nowrap opacity-0 transition-opacity duration-300">klick mich an</span>
+  </div>
+
+  <!-- Death Screen Overlay -->
+  <div id="txpDeathScreen" class="fixed inset-0 z-[70] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500" style="background-color: var(--color-bg);">
+    <p class="text-lg md:text-2xl font-light tracking-wide">Deine Punktzahl</p>
+    <h2 id="deathScoreDisplay" class="text-5xl md:text-7xl lg:text-9xl font-bold tracking-tight mt-2 mb-6">0000</h2>
+    <p id="txpHighscoreDisplay" class="text-sm font-light tracking-widest uppercase mb-12 opacity-50">Highscore &nbsp; 0000</p>
+    <p class="text-sm font-light tracking-widest uppercase opacity-50">Leertaste zum Neustarten</p>
+  </div>
+
+  <!-- Pause Screen Overlay -->
+  <div id="txpPauseScreen" class="fixed inset-0 z-[70] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="background-color: var(--color-bg);">
+    <h2 class="text-5xl md:text-7xl lg:text-9xl font-bold tracking-tight mb-8">Pausiert</h2>
+    <div class="flex flex-col gap-3 text-center">
+      <p class="text-sm font-light tracking-widest uppercase opacity-70">ESC zum Fortsetzen</p>
+      <p class="text-sm font-light tracking-widest uppercase opacity-70">Leertaste zum Neustarten</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  interface AnimationConfig {
+    frames: number;
+    fps: number;
+    path: string;
+  }
+
+  type AnimationName = "jump" | "idle" | "walk" | "talk";
+
+  const ANIMATIONS: Record<AnimationName, AnimationConfig> = {
+    jump: { frames: 120, fps: 15, path: "/animations/txp/jump/TXP%20Sprung_" },
+    idle: { frames: 24, fps: 24, path: "/animations/txp/idle/TXP%20Stand%20Pose_" },
+    walk: { frames: 24, fps: 24, path: "/animations/txp/walk/TXP%20Lauf%20Loop_" }, // Base FPS, wird dynamisch erhöht
+    talk: { frames: 24, fps: 24, path: "/animations/txp/talk/TXP_Talk%20Pose_" },
+  };
+
+  const ENEMY_WALK = {
+    frames: 12,
+    fps: 24,
+    path: "/animations/enemy1/walk/AI%20Gegner_FPS%2012",
+  };
+
+  const ENEMY2_JUMP = {
+    frames: 24,
+    fps: 36,
+    path: "/animations/enemy2/Gegner%20Loop_",
+  };
+
+  const ENEMY3_FLY = {
+    frames: 9,
+    fps: 10,
+    path: "/animations/enemy3/frame_",
+    darkPath: "/animations/enemy3/darkmode/frame_",
+    suffix: "_delay-0.1s.png",
+  };
+
+  type EnemyType = "walk" | "jump" | "fly";
+
+  interface EnemyInstance {
+    element: HTMLDivElement;
+    sprite: HTMLImageElement;
+    x: number;
+    currentFrame: number;
+    lastFrameTime: number;
+    type: EnemyType;
+    jumpOffset: number;
+    lastJumpTime: number;
+    speed: number;
+    dying: boolean;
+    baseY: number;
+    hitbox: { x: number; y: number; w: number; h: number };
+    floatAmplitude: number;
+    points: number;
+  }
+
+  function padFrame(num: number): string {
+    return num.toString().padStart(5, "0");
+  }
+
+  function preloadAnimation(anim: AnimationName): Promise<HTMLImageElement[]> {
+    const config = ANIMATIONS[anim];
+    const images: HTMLImageElement[] = [];
+    const promises: Promise<void>[] = [];
+
+    for (let i = 0; i < config.frames; i++) {
+      const img = new Image();
+      const promise = new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => {
+          console.warn(`TXP: Failed to load frame ${img.src}`);
+          resolve();
+        };
+      });
+      img.src = `${config.path}${padFrame(i)}.png`;
+      images.push(img);
+      promises.push(promise);
+    }
+
+    return Promise.all(promises).then(() => images);
+  }
+
+  function preloadEnemyAnimation(): Promise<HTMLImageElement[]> {
+    const images: HTMLImageElement[] = [];
+    const promises: Promise<void>[] = [];
+    for (let i = 0; i < ENEMY_WALK.frames; i++) {
+      const img = new Image();
+      const promise = new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      });
+      img.src = `${ENEMY_WALK.path}${padFrame(i)}.png`;
+      images.push(img);
+      promises.push(promise);
+    }
+    return Promise.all(promises).then(() => images);
+  }
+
+  function preloadEnemy2Animation(): Promise<HTMLImageElement[]> {
+    const images: HTMLImageElement[] = [];
+    const promises: Promise<void>[] = [];
+    for (let i = 0; i < ENEMY2_JUMP.frames; i++) {
+      const img = new Image();
+      const promise = new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      });
+      img.src = `${ENEMY2_JUMP.path}${padFrame(i)}.png`;
+      images.push(img);
+      promises.push(promise);
+    }
+    return Promise.all(promises).then(() => images);
+  }
+
+  function preloadEnemy3Animation(): Promise<HTMLImageElement[]> {
+    const images: HTMLImageElement[] = [];
+    const promises: Promise<void>[] = [];
+    for (let i = 0; i < ENEMY3_FLY.frames; i++) {
+      const img = new Image();
+      const promise = new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      });
+      img.src = `${ENEMY3_FLY.path}${i}${ENEMY3_FLY.suffix}`;
+      images.push(img);
+      promises.push(promise);
+    }
+    return Promise.all(promises).then(() => images);
+  }
+
+  function preloadEnemy3DarkAnimation(): Promise<HTMLImageElement[]> {
+    const images: HTMLImageElement[] = [];
+    const promises: Promise<void>[] = [];
+    for (let i = 0; i < ENEMY3_FLY.frames; i++) {
+      const img = new Image();
+      const promise = new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      });
+      img.src = `${ENEMY3_FLY.darkPath}${i}${ENEMY3_FLY.suffix}`;
+      images.push(img);
+      promises.push(promise);
+    }
+    return Promise.all(promises).then(() => images);
+  }
+
+  class TXPAnimator {
+    private sprite: HTMLImageElement;
+    private character: HTMLElement;
+    private platform: HTMLElement;
+    private platformContainer: HTMLElement;
+    private heroTextTil: HTMLElement;
+    private heroTextTXP: HTMLElement;
+    private heroTextFinal: HTMLElement;
+    private heroTextRunner: HTMLElement;
+    private heroTextJump: HTMLElement;
+    private heroTextScore: HTMLElement;
+    private scoreDisplay: HTMLElement;
+    private clickHint: HTMLElement;
+    private runnerGround: HTMLElement;
+    private currentFrames: HTMLImageElement[] = [];
+    private currentFrame = 0;
+    private animationId: number | null = null;
+    private lastFrameTime = 0;
+    private fps = 24;
+    private isActive = false;
+    private isLanded = false;
+    private textState = 0; // 0 = Til Sander, 1 = TXP, 2 = Final, 3 = Running
+    private cachedAnimations: Map<AnimationName, HTMLImageElement[]> = new Map();
+    private hintTimeout: ReturnType<typeof setTimeout> | null = null;
+    private isShowingHint = false;
+    private isRunning = false;
+    private isJumping = false;
+    private runnerAnimationId: number | null = null;
+    private groundOffset = 0;
+    private totalLeftExtension = 0;
+    private scaleAfterPhase1 = 0;
+    private jumpHintTimeout: ReturnType<typeof setTimeout> | null = null;
+    private boundHandleKeydown: (e: KeyboardEvent) => void;
+    private score = 0;
+    private scoreAccum = 0;
+    private scoreLoopId: number | null = null;
+    private hasJumpedOnce = false;
+    private enemies: EnemyInstance[] = [];
+    private enemyFrames: HTMLImageElement[] = [];
+    private enemy2Frames: HTMLImageElement[] = [];
+    private enemy3Frames: HTMLImageElement[] = [];
+    private enemy3DarkFrames: HTMLImageElement[] = [];
+    private distanceSinceLastSpawn = 0;
+    private nextSpawnGap = 0;
+    private gameLoopId: number | null = null;
+    private showHitboxes = false;
+    private isDead = false;
+    private isPaused = false;
+    private highscore = 0;
+    private deathScreen!: HTMLElement;
+    private deathScoreDisplay!: HTMLElement;
+    private highscoreDisplay!: HTMLElement;
+    private pauseScreen!: HTMLElement;
+    private txpHitbox = { x: 20, y: 10, w: 50, h: 76 };
+    private enemyHitbox = { x: 10, y: 5, w: 65, h: 80 };
+    private txpHitboxEl: HTMLDivElement | null = null;
+    private enemySpeed = 250; // Base speed, wird nicht mehr verwendet
+    private platformStartWidth = 0;
+    private baseEnemySpeed = 250; // Basis-Geschwindigkeit
+    private basePlatformScrollSpeed = 80; // Basis-Scroll-Geschwindigkeit
+    private baseWalkFPS = 24; // Basis-FPS für Walk-Animation
+    private isSpacePressed = false; // Leertaste gedrückt?
+    private flyStartTime = 0; // Zeitpunkt Flug-Start
+    private maxFlyDuration = 2000; // Max 2s Flugzeit
+    private isFlying = false; // Im Flugmodus?
+    private flyFreezeProgress = 0; // Progress-Wert beim Start des Flugs
+    private currentJumpProgress = 0; // Aktueller Progress während des Sprungs
+    private jumpTotalPausedTime = 0; // Gesamte Pause-Zeit während des Sprungs
+    private jumpStartTime = 0; // Start-Zeit des aktuellen Sprungs
+    private jumpDelayDuration = 0; // Delay-Dauer des aktuellen Sprungs
+    private jumpDurationWithoutDelay = 0; // Sprung-Dauer ohne Delay
+    private hasUsedFlyThisJump = false; // Flug bereits in diesem Sprung genutzt?
+    private flyTargetProgress = 0; // Ziel-Progress nach Flug-Ende
+    private totalFlyPausedTime = 0; // Gesamt-Pausenzeit während Flug (Instanz-Variable)
+    private boundHandleKeyup: (e: KeyboardEvent) => void;
+
+    constructor() {
+      this.sprite = document.getElementById("txpSprite") as HTMLImageElement;
+      this.character = document.getElementById("txpCharacter") as HTMLElement;
+      this.platform = document.getElementById("txpPlatform") as HTMLElement;
+      this.platformContainer = document.getElementById("txpPlatformContainer") as HTMLElement;
+      this.heroTextTil = document.getElementById("heroTextTil") as HTMLElement;
+      this.heroTextTXP = document.getElementById("heroTextTXP") as HTMLElement;
+      this.heroTextFinal = document.getElementById("heroTextFinal") as HTMLElement;
+      this.heroTextRunner = document.getElementById("heroTextRunner") as HTMLElement;
+      this.heroTextJump = document.getElementById("heroTextJump") as HTMLElement;
+      this.heroTextScore = document.getElementById("heroTextScore") as HTMLElement;
+      this.scoreDisplay = document.getElementById("scoreDisplay") as HTMLElement;
+      this.clickHint = document.getElementById("txpClickHint") as HTMLElement;
+      this.runnerGround = document.getElementById("txpRunnerGround") as HTMLElement;
+      this.deathScreen = document.getElementById("txpDeathScreen") as HTMLElement;
+      this.deathScoreDisplay = document.getElementById("deathScoreDisplay") as HTMLElement;
+      this.highscoreDisplay = document.getElementById("txpHighscoreDisplay") as HTMLElement;
+      this.pauseScreen = document.getElementById("txpPauseScreen") as HTMLElement;
+      this.highscore = parseInt(localStorage.getItem("txpHighscore") ?? "0", 10);
+
+      // Bind keydown/keyup handlers
+      this.boundHandleKeydown = this.handleKeydown.bind(this);
+      this.boundHandleKeyup = this.handleKeyup.bind(this);
+
+      // Update position on resize
+      window.addEventListener("resize", () => {
+        if (this.isActive && this.isLanded) {
+          this.updatePosition();
+        }
+      });
+
+      // Click on TXP to make him talk or start running
+      this.character.addEventListener("click", () => {
+        if (!this.isActive) return;
+
+        if (this.textState < 2) {
+          this.cancelHintTimer();
+          this.hideHint();
+          this.talk();
+        } else if (this.textState === 2 && !this.isRunning) {
+          this.startRunnerMode();
+        }
+      });
+    }
+
+    private cancelHintTimer() {
+      if (this.hintTimeout) {
+        clearTimeout(this.hintTimeout);
+        this.hintTimeout = null;
+      }
+    }
+
+    private hideHint() {
+      this.clickHint.style.opacity = "0";
+      this.isShowingHint = false;
+    }
+
+    private async showClickHint() {
+      if (!this.isActive || this.textState >= 2 || this.isShowingHint) return;
+
+      this.isShowingHint = true;
+
+      // Show hint text
+      this.clickHint.style.opacity = "1";
+
+      // Play talk animation for 2 seconds
+      this.playHintTalkAnimation();
+
+      // Hide hint after 2 seconds
+      setTimeout(() => {
+        if (this.isActive) {
+          this.hideHint();
+        }
+      }, 2000);
+    }
+
+    private async playHintTalkAnimation() {
+      let talkFrames = this.cachedAnimations.get("talk");
+      if (!talkFrames) {
+        talkFrames = await preloadAnimation("talk");
+        this.cachedAnimations.set("talk", talkFrames);
+      }
+
+      // Play talk animation for 2 seconds (2 loops at 24fps with 24 frames = 2 seconds)
+      const startTime = performance.now();
+      const duration = 2000;
+
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId);
+      }
+
+      this.currentFrames = talkFrames;
+      this.currentFrame = 0;
+      this.fps = 24;
+      this.lastFrameTime = performance.now();
+
+      const animateHint = (time: number) => {
+        if (!this.isActive || !this.isShowingHint) {
+          // Return to idle if still active
+          if (this.isActive) {
+            this.returnToIdle();
+          }
+          return;
+        }
+
+        const elapsed = time - startTime;
+        if (elapsed >= duration) {
+          // Return to idle after 2 seconds
+          this.returnToIdle();
+          return;
+        }
+
+        const frameElapsed = time - this.lastFrameTime;
+        const frameInterval = 1000 / this.fps;
+
+        if (frameElapsed >= frameInterval) {
+          this.sprite.src = this.currentFrames[this.currentFrame].src;
+          this.currentFrame = (this.currentFrame + 1) % this.currentFrames.length;
+          this.lastFrameTime = time - (frameElapsed % frameInterval);
+        }
+
+        this.animationId = requestAnimationFrame(animateHint);
+      };
+
+      this.animationId = requestAnimationFrame(animateHint);
+    }
+
+    private async returnToIdle() {
+      let idleFrames = this.cachedAnimations.get("idle");
+      if (!idleFrames) {
+        idleFrames = await preloadAnimation("idle");
+        this.cachedAnimations.set("idle", idleFrames);
+      }
+      if (this.isActive) {
+        this.playAnimation(idleFrames, 24, true);
+      }
+    }
+
+    private startHintTimer() {
+      this.cancelHintTimer();
+      if (this.textState >= 2) return;
+
+      this.hintTimeout = setTimeout(() => {
+        this.showClickHint();
+      }, 3000);
+    }
+
+    private async startRunnerMode() {
+      this.isRunning = true;
+      this.textState = 3;
+
+      // Preload enemy animations early
+      preloadEnemyAnimation().then(frames => {
+        this.enemyFrames = frames;
+      });
+      preloadEnemy2Animation().then(frames => {
+        this.enemy2Frames = frames;
+      });
+      preloadEnemy3Animation().then(frames => {
+        this.enemy3Frames = frames;
+      });
+      preloadEnemy3DarkAnimation().then(frames => {
+        this.enemy3DarkFrames = frames;
+      });
+
+      // Phase 1: Extend platform to the right
+      const platformRect = this.platform.getBoundingClientRect();
+      const startWidth = platformRect.width;
+      this.platformStartWidth = startWidth; // Save for resume()
+      const platformLeft = platformRect.left;
+      const targetWidthRight = startWidth + (window.innerWidth - platformRect.right);
+      const extendSpeed = 400; // pixels per second
+
+      this.platform.style.transformOrigin = "left center";
+
+      // Animate to the right
+      await new Promise<void>((resolve) => {
+        const startTime = performance.now();
+        const duration = (targetWidthRight - startWidth) / extendSpeed * 1000;
+
+        const animate = (currentTime: number) => {
+          if (!this.isActive || !this.isRunning) {
+            resolve();
+            return;
+          }
+
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const currentWidth = startWidth + (targetWidthRight - startWidth) * progress;
+          const scale = currentWidth / startWidth;
+
+          this.platform.style.transform = `scaleX(${scale})`;
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            resolve();
+          }
+        };
+
+        requestAnimationFrame(animate);
+      });
+
+      if (!this.isActive || !this.isRunning) return;
+
+      // Short pause before phase 2
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      if (!this.isActive || !this.isRunning) return;
+
+      // Phase 2: Extend platform to the left (right edge stays at screen edge)
+      // Switch to runner text
+      this.heroTextFinal.style.opacity = "0";
+      this.heroTextFinal.style.transform = "translateY(-2rem)";
+      setTimeout(() => {
+        this.heroTextRunner.style.opacity = "1";
+        this.heroTextRunner.style.transform = "translateY(0)";
+      }, 150);
+
+      // Start walk animation now (FPS wird dynamisch in playAnimation erhöht)
+      let walkFrames = this.cachedAnimations.get("walk");
+      if (!walkFrames) {
+        walkFrames = await preloadAnimation("walk");
+        this.cachedAnimations.set("walk", walkFrames);
+      }
+      this.playAnimation(walkFrames, this.baseWalkFPS, true);
+
+      // Show jump hint after 4 seconds and enable spacebar
+      this.jumpHintTimeout = setTimeout(() => {
+        if (!this.isActive || !this.isRunning) return;
+        this.heroTextRunner.style.opacity = "0";
+        this.heroTextRunner.style.transform = "translateY(-2rem)";
+        setTimeout(() => {
+          this.heroTextJump.style.opacity = "1";
+          this.heroTextJump.style.transform = "translateY(0)";
+        }, 150);
+        window.addEventListener("keydown", this.boundHandleKeydown);
+        window.addEventListener("keyup", this.boundHandleKeyup);
+        // Start game loop (spawning happens inside)
+        this.distanceSinceLastSpawn = 0;
+      this.nextSpawnGap = this.getNextSpawnGap();
+        this.startGameLoop();
+      }, 4000);
+
+      this.scaleAfterPhase1 = targetWidthRight / startWidth;
+      let lastTime = performance.now();
+      this.totalLeftExtension = 0;
+
+      const animateLeft = (time: number) => {
+        if (!this.isActive || !this.isRunning || this.isPaused) return;
+
+        const delta = (time - lastTime) / 1000;
+        lastTime = time;
+
+        // Scroll-Geschwindigkeit steigt mit Score
+        const scrollSpeed = this.getCurrentPlatformScrollSpeed();
+        this.totalLeftExtension += scrollSpeed * delta;
+
+        // Move left and scale more to keep right edge in place
+        const additionalScale = this.totalLeftExtension / startWidth;
+        const totalScale = this.scaleAfterPhase1 + additionalScale;
+
+        this.platform.style.transform = `translateX(-${this.totalLeftExtension}px) scaleX(${totalScale})`;
+
+        this.runnerAnimationId = requestAnimationFrame(animateLeft);
+      };
+
+      this.runnerAnimationId = requestAnimationFrame(animateLeft);
+    }
+
+    private handleKeydown(e: KeyboardEvent) {
+      if (e.code === "Space" && this.isRunning) {
+        e.preventDefault();
+        if (this.isDead) {
+          this.restart();
+        } else if (this.isPaused) {
+          this.restart();
+        } else if (!this.isJumping) {
+          this.jump();
+        } else if (this.isJumping && !this.isFlying && !this.isSpacePressed && !this.hasUsedFlyThisJump && !e.repeat) {
+          // Start flying when space is pressed during jump (only once per jump, not on key repeat)
+          this.isSpacePressed = true;
+          this.startFlying();
+        }
+      }
+      if (e.code === "Escape" && this.isRunning && this.hasJumpedOnce) {
+        e.preventDefault();
+        if (this.isPaused) {
+          this.resume();
+        } else if (!this.isDead) {
+          this.pause();
+        }
+      }
+      if (e.code === "KeyH" && this.isRunning) {
+        this.toggleHitboxes();
+      }
+    }
+
+    private handleKeyup(e: KeyboardEvent) {
+      if (e.code === "Space") {
+        this.isSpacePressed = false;
+        if (this.isFlying) {
+          this.stopFlying();
+        }
+      }
+    }
+
+    private startFlying() {
+      this.isFlying = true;
+      this.flyStartTime = performance.now();
+      this.flyFreezeProgress = this.currentJumpProgress;
+      this.hasUsedFlyThisJump = true; // Mark fly as used for this jump
+    }
+
+    private stopFlying() {
+      if (!this.isFlying) return;
+      this.isFlying = false;
+
+      // Calculate target progress for falling down
+      if (this.flyFreezeProgress < 0.5) {
+        // Was going up, mirror to falling down position with same height
+        // sin(x) = sin(π - x), so progress at same height on way down is (1 - progress)
+        this.flyTargetProgress = 1 - this.flyFreezeProgress;
+      } else {
+        // Already falling, continue from current position
+        this.flyTargetProgress = this.flyFreezeProgress;
+      }
+
+      // Note: jumpTotalPausedTime adjustment happens in animateJumpPosition
+      // where it has correct access to all local pause state
+    }
+
+    private async jump() {
+      if (this.isJumping || this.isPaused) return;
+      this.isJumping = true;
+      this.isSpacePressed = false;
+      this.isFlying = false;
+      this.jumpTotalPausedTime = 0; // Reset pause time for new jump
+      this.hasUsedFlyThisJump = false; // Reset fly usage for new jump
+
+      // Load jump animation (only use first 83 frames)
+      let jumpFrames = this.cachedAnimations.get("jump");
+      if (!jumpFrames) {
+        jumpFrames = await preloadAnimation("jump");
+        this.cachedAnimations.set("jump", jumpFrames);
+      }
+      const shortJumpFrames = jumpFrames.slice(0, 89);
+
+      // Animate character position (jump arc, starts after frame 5)
+      const jumpHeight = 210;
+      const totalFrames = 89;
+      const startFrame = 5;
+      const fps = 55;
+      const jumpDuration = (totalFrames / fps) * 1000;
+      const delayDuration = (startFrame / fps) * 1000;
+
+      // Position animation with integrated delay, pause, and fly support
+      const startTime = performance.now();
+      this.jumpStartTime = startTime;
+      this.jumpDelayDuration = delayDuration;
+      this.jumpDurationWithoutDelay = jumpDuration - delayDuration;
+      this.totalFlyPausedTime = 0;
+      let pauseStartTime = 0;
+      let flyPauseStartTime = 0;
+      let wasFlying = false; // Track previous flying state to detect transition
+
+      const animateJumpPosition = () => {
+        if (!this.isJumping) return;
+
+        // Handle pause
+        if (this.isPaused) {
+          if (pauseStartTime === 0) {
+            pauseStartTime = performance.now();
+          }
+          if (this.isFlying && flyPauseStartTime === 0) {
+            flyPauseStartTime = performance.now();
+          }
+          requestAnimationFrame(animateJumpPosition);
+          return;
+        } else if (pauseStartTime > 0) {
+          this.jumpTotalPausedTime += performance.now() - pauseStartTime;
+          pauseStartTime = 0;
+          if (flyPauseStartTime > 0) {
+            this.totalFlyPausedTime += performance.now() - flyPauseStartTime;
+            flyPauseStartTime = 0;
+          }
+        }
+
+        const now = performance.now();
+        const elapsed = now - startTime - this.jumpTotalPausedTime;
+
+        // Handle delay period
+        if (elapsed < delayDuration) {
+          requestAnimationFrame(animateJumpPosition);
+          return;
+        }
+
+        const jumpElapsed = elapsed - delayDuration;
+        const jumpDurationWithoutDelay = jumpDuration - delayDuration;
+        let progress = Math.min(jumpElapsed / jumpDurationWithoutDelay, 1);
+
+        // Save current progress for flying
+        this.currentJumpProgress = progress;
+
+        // If flying, hold at current position for up to 2s
+        if (this.isFlying) {
+          wasFlying = true;
+          const flyElapsed = now - this.flyStartTime - this.totalFlyPausedTime;
+          if (flyElapsed < this.maxFlyDuration) {
+            // Hold at frozen position
+            progress = this.flyFreezeProgress;
+          } else {
+            // Max fly time reached, stop flying
+            this.stopFlying();
+          }
+        }
+
+        // Detect fly->not-flying transition: adjust jumpTotalPausedTime here
+        // where we have correct access to all local pause state
+        if (wasFlying && !this.isFlying && this.flyTargetProgress > 0) {
+          wasFlying = false;
+          // Adjust jumpTotalPausedTime so the next calculated progress equals flyTargetProgress
+          // Formula: progress = (now - startTime - jumpTotalPausedTime - delayDuration) / jumpDurationWithoutDelay
+          // Solve for jumpTotalPausedTime:
+          this.jumpTotalPausedTime = now - startTime - delayDuration - (this.flyTargetProgress * jumpDurationWithoutDelay);
+          progress = this.flyTargetProgress;
+          this.flyTargetProgress = 0;
+        }
+
+        const arc = Math.sin(progress * Math.PI);
+        const offsetY = -jumpHeight * arc;
+        this.character.style.transform = `translateY(${offsetY}px)`;
+
+        if (progress < 1 || this.isFlying) {
+          requestAnimationFrame(animateJumpPosition);
+        } else {
+          this.character.style.transform = "";
+        }
+      };
+      requestAnimationFrame(animateJumpPosition);
+
+      // Play jump animation at 50 fps, stop early if flying starts
+      await Promise.race([
+        this.playAnimation(shortJumpFrames, 50, false),
+        new Promise<void>((resolve) => {
+          const checkFly = () => {
+            if (this.isFlying) resolve();
+            else if (!this.isJumping) resolve();
+            else requestAnimationFrame(checkFly);
+          };
+          requestAnimationFrame(checkFly);
+        }),
+      ]);
+
+      // If flying, cancel jump animation and play hover loop (frames 33-36) at jump FPS
+      if (this.isFlying && this.isJumping) {
+        if (this.animationId) {
+          cancelAnimationFrame(this.animationId);
+          this.animationId = null;
+        }
+
+        const hoverFrames = [shortJumpFrames[32], shortJumpFrames[33], shortJumpFrames[34], shortJumpFrames[35]];
+        let hoverIdx = 0;
+        let lastHoverTime = performance.now();
+        let hoverPauseStart = 0;
+
+        await new Promise<void>((resolve) => {
+          const animateHover = (time: number) => {
+            if (!this.isFlying || !this.isJumping) {
+              resolve();
+              return;
+            }
+
+            if (this.isPaused) {
+              if (hoverPauseStart === 0) hoverPauseStart = time;
+              requestAnimationFrame(animateHover);
+              return;
+            } else if (hoverPauseStart > 0) {
+              lastHoverTime += time - hoverPauseStart;
+              hoverPauseStart = 0;
+            }
+
+            const elapsed = time - lastHoverTime;
+            if (elapsed >= 1000 / fps) {
+              this.sprite.src = hoverFrames[hoverIdx].src;
+              hoverIdx = (hoverIdx + 1) % hoverFrames.length;
+              lastHoverTime = time - (elapsed % (1000 / fps));
+            }
+            requestAnimationFrame(animateHover);
+          };
+          requestAnimationFrame(animateHover);
+        });
+
+        // Continue jump animation from frame 37 (index 36) after hover ends.
+        // Promise.race stops the sprite as soon as position lands.
+        if (this.isJumping) {
+          const remainingFrames = shortJumpFrames.slice(36);
+          await Promise.race([
+            this.playAnimation(remainingFrames, 50, false),
+            new Promise<void>(resolve => {
+              const checkLanded = () => {
+                if (this.currentJumpProgress >= 1 || !this.isJumping) resolve();
+                else requestAnimationFrame(checkLanded);
+              };
+              requestAnimationFrame(checkLanded);
+            }),
+          ]);
+        }
+      }
+
+      // Return to walk animation starting at frame 13 (index 12)
+      if (this.isRunning) {
+        let walkFrames = this.cachedAnimations.get("walk");
+        if (!walkFrames) {
+          walkFrames = await preloadAnimation("walk");
+          this.cachedAnimations.set("walk", walkFrames);
+        }
+        this.playAnimation(walkFrames, this.baseWalkFPS, true, 12);
+      }
+
+      this.isJumping = false;
+      this.isFlying = false;
+
+      // After first jump, show score and start counting
+      if (!this.hasJumpedOnce) {
+        this.hasJumpedOnce = true;
+        this.distanceSinceLastSpawn = 0;
+        this.nextSpawnGap = this.getNextSpawnGap();
+        this.heroTextJump.style.opacity = "0";
+        this.heroTextJump.style.transform = "translateY(-2rem)";
+        setTimeout(() => {
+          this.heroTextScore.style.opacity = "1";
+          this.heroTextScore.style.transform = "translateY(0)";
+        }, 150);
+
+        // Start score counter
+        this.score = 1;
+        this.scoreAccum = 1;
+        this.scoreDisplay.textContent = this.formatScore(this.score);
+        this.startScoreLoop();
+      }
+    }
+
+    private formatScore(score: number): string {
+      return score.toString().padStart(4, "0");
+    }
+
+    private startScoreLoop() {
+      this.stopScoreLoop();
+      let lastTime = performance.now();
+      const loop = (time: number) => {
+        const delta = Math.min((time - lastTime) / 1000, 0.1);
+        lastTime = time;
+        // Base: 10 Punkte/s – skaliert mit Spielgeschwindigkeit
+        this.scoreAccum += 10 * this.getSpeedMultiplier() * delta;
+        const newScore = Math.floor(this.scoreAccum);
+        if (newScore > this.score) {
+          this.score = newScore;
+          this.scoreDisplay.textContent = this.formatScore(this.score);
+        }
+        this.scoreLoopId = requestAnimationFrame(loop);
+      };
+      this.scoreLoopId = requestAnimationFrame(loop);
+    }
+
+    private stopScoreLoop() {
+      if (this.scoreLoopId) {
+        cancelAnimationFrame(this.scoreLoopId);
+        this.scoreLoopId = null;
+      }
+    }
+
+    private getSpeedMultiplier(): number {
+      // Geschwindigkeit steigt endless mit Score (kein Limit)
+      return 1 + this.score / 1000;
+    }
+
+    private getCurrentEnemySpeed(baseSpeed: number): number {
+      return baseSpeed * this.getSpeedMultiplier();
+    }
+
+    private getCurrentPlatformScrollSpeed(): number {
+      return this.basePlatformScrollSpeed * this.getSpeedMultiplier();
+    }
+
+    private getCurrentWalkFPS(): number {
+      return this.baseWalkFPS * this.getSpeedMultiplier();
+    }
+
+    private getNextSpawnGap(): number {
+      // Ziel-Zeit sinkt mit Score, dann in Pixel umrechnen (distanzbasiert)
+      const speed = this.getCurrentPlatformScrollSpeed();
+      const minTimeSec = Math.max(1.0, 3.0 - this.score / 1000);         // 3s → min 1s
+      const variationSec = Math.random() * Math.max(0.5, 2.5 - this.score / 2000); // schrumpft auch
+      return (minTimeSec + variationSec) * speed;
+    }
+
+    private spawnEnemy() {
+      // Randomly choose enemy type: 35% walk, 35% jump, 30% fly
+      // enemy2 (jump) wird zwischen Score 800–1000 nicht gespawnt
+      const jumpBlocked = this.score >= 800 && this.score < 1000;
+      const rand = Math.random();
+      let type: EnemyType;
+      if (jumpBlocked) {
+        type = rand < 0.5 ? "walk" : "fly";
+      } else {
+        type = rand < 0.35 ? "walk" : rand < 0.70 ? "jump" : "fly";
+      }
+
+      const isDarkAtSpawn = document.documentElement.getAttribute("data-theme") === "dark";
+      const frames =
+        type === "fly"
+          ? (isDarkAtSpawn && this.enemy3DarkFrames.length > 0 ? this.enemy3DarkFrames : this.enemy3Frames)
+          : type === "jump" ? this.enemy2Frames
+          : this.enemyFrames;
+
+      if (frames.length === 0) return;
+
+      // Bei fly: 20% Chance auf große Variante
+      const isBigFly = type === "fly" && Math.random() < 0.2;
+      // Bei walk: 90% Chance auf große Variante (Testing)
+      const isBigWalk = type === "walk" && Math.random() < 0.2;
+
+      const el = document.createElement("div");
+      const size = type === "jump" ? 95 : type === "fly" ? (isBigFly ? 200 : 130) : (isBigWalk ? 270 : 90);
+      const zIndex = type === "walk" ? 59 : type === "jump" ? 55 : 53;
+      el.style.cssText = `position:fixed;width:${size}px;height:${size}px;pointer-events:none;z-index:${zIndex};`;
+
+      const img = document.createElement("img");
+      // enemy3 (fly) ist bereits in die richtige Richtung gezeichnet – kein Flip
+      img.className = "txp-sprite";
+      img.style.cssText = type === "fly"
+        ? "width:100%;height:100%;object-fit:contain;"
+        : "width:100%;height:100%;object-fit:contain;transform:scaleX(-1);";
+      img.src = frames[0].src;
+      el.appendChild(img);
+
+      const platformRect = this.platformContainer.getBoundingClientRect();
+      const x = window.innerWidth + 10;
+      // Fly: 200px über Platform-Top (im Sprung-Gefahrenbereich), sonst bodennah
+      const yOffset = type === "fly" ? 200 : type === "jump" ? 91 : (isBigWalk ? 260 : 86);
+      const y = platformRect.top - yOffset;
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+
+      // Hitbox: fly hat kleinere Höhe (nur Vogelkörper), big fly skaliert auf 200px Container
+      // big walk: 3x skalierte Hitbox (270px Container)
+      const hitbox = type === "fly"
+        ? isBigFly
+          ? { x: 20, y: 65, w: 160, h: 60 }
+          : { x: 15, y: 30, w: 80,  h: 40 }
+        : isBigWalk
+          ? { x: 30, y: 15, w: 195, h: 240 }
+          : this.enemyHitbox;
+
+      // Add hitbox overlay if hitboxes are shown
+      if (this.showHitboxes) {
+        this.addHitboxOverlay(el, hitbox);
+      }
+
+      document.body.appendChild(el);
+
+      // Base speeds: walk 200 (big walk 100), jump 130, fly 221 (normal) / 170 (big) px/s
+      const baseSpeed = type === "walk" ? (isBigWalk ? 100 : 200) : type === "jump" ? 130 : (isBigFly ? 170 : 221);
+      const speed = this.getCurrentEnemySpeed(baseSpeed);
+
+      // Points: big walk 30P, walk 10P, jump 20P, big fly 50P, fly 15P
+      const points = type === "walk" ? (isBigWalk ? 30 : 10)
+        : type === "jump" ? 20
+        : (isBigFly ? 50 : 15);
+
+      this.enemies.push({
+        element: el,
+        sprite: img,
+        x,
+        currentFrame: 0,
+        lastFrameTime: performance.now(),
+        type,
+        jumpOffset: 0,
+        lastJumpTime: performance.now(),
+        speed: speed,
+        dying: false,
+        baseY: y,
+        hitbox,
+        floatAmplitude: type === "fly" ? (isBigFly ? 66 : 22) : 0,
+        points,
+      });
+    }
+
+    private startGameLoop() {
+      let lastTime = performance.now();
+
+      const loop = (time: number) => {
+        if (!this.isRunning || this.isDead || this.isPaused) return;
+
+        const delta = (time - lastTime) / 1000;
+        lastTime = time;
+
+        // Distanz-basiertes Spawning wie Chrome Dino
+        if (this.hasJumpedOnce) {
+          this.distanceSinceLastSpawn += this.getCurrentPlatformScrollSpeed() * delta;
+          if (this.distanceSinceLastSpawn >= this.nextSpawnGap) {
+            this.spawnEnemy();
+            this.distanceSinceLastSpawn = 0;
+            this.nextSpawnGap = this.getNextSpawnGap();
+          }
+        }
+
+        this.updateEnemies(delta, time);
+        this.checkCollisions();
+
+        this.gameLoopId = requestAnimationFrame(loop);
+      };
+
+      this.gameLoopId = requestAnimationFrame(loop);
+    }
+
+    private updateEnemies(delta: number, time: number) {
+      for (let i = this.enemies.length - 1; i >= 0; i--) {
+        const enemy = this.enemies[i];
+        if (enemy.dying) continue;
+
+        // Move enemy left – big fly: Geschwindigkeit variiert per Sinuswelle
+        if (enemy.floatAmplitude === 66) {
+          const speedMult = 1 + Math.sin(time * 0.0015) * 0.7; // 0.3x–1.7x
+          enemy.x -= enemy.speed * delta * speedMult;
+        } else {
+          enemy.x -= enemy.speed * delta;
+        }
+        enemy.element.style.left = `${enemy.x}px`;
+
+        // Handle jumping for enemy2
+        if (enemy.type === "jump") {
+          // Jump every 5 seconds
+          if (time - enemy.lastJumpTime >= 5000) {
+            enemy.lastJumpTime = time;
+          }
+
+          // Calculate jump progress (0 to 1 over 4.8 seconds, then stay grounded for 0.2s)
+          const jumpProgress = Math.min((time - enemy.lastJumpTime) / 4800, 1);
+          // Sine wave for smooth jump arc
+          const jumpHeight = 400; // pixels (higher jump)
+          enemy.jumpOffset = -Math.abs(Math.sin(jumpProgress * Math.PI)) * jumpHeight;
+          enemy.element.style.top = `${this.platformContainer.getBoundingClientRect().top - 91 + enemy.jumpOffset}px`;
+
+          // Animate enemy2 frames
+          const frameInterval = 1000 / ENEMY2_JUMP.fps;
+          if (time - enemy.lastFrameTime >= frameInterval) {
+            enemy.currentFrame = (enemy.currentFrame + 1) % this.enemy2Frames.length;
+            enemy.sprite.src = this.enemy2Frames[enemy.currentFrame].src;
+            enemy.lastFrameTime = time;
+          }
+        } else if (enemy.type === "fly") {
+          // Auf-und-Ab-Schweben: big fly fliegt weniger weit nach unten
+          const sinVal = Math.sin(time * 0.002);
+          const floatOffset = enemy.floatAmplitude === 66
+            ? sinVal * (sinVal > 0 ? 22 : 66)
+            : sinVal * enemy.floatAmplitude;
+          enemy.element.style.top = `${enemy.baseY + floatOffset}px`;
+
+          // Dark-Mode-Support: passende Frames wählen
+          const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+          const flyFrames = isDark && this.enemy3DarkFrames.length > 0
+            ? this.enemy3DarkFrames
+            : this.enemy3Frames;
+
+          const frameInterval = 1000 / ENEMY3_FLY.fps;
+          if (time - enemy.lastFrameTime >= frameInterval) {
+            enemy.currentFrame = (enemy.currentFrame + 1) % flyFrames.length;
+            enemy.sprite.src = flyFrames[enemy.currentFrame].src;
+            enemy.lastFrameTime = time;
+          }
+        } else {
+          // Animate enemy1 frames
+          const frameInterval = 1000 / ENEMY_WALK.fps;
+          if (time - enemy.lastFrameTime >= frameInterval) {
+            enemy.currentFrame = (enemy.currentFrame + 1) % this.enemyFrames.length;
+            enemy.sprite.src = this.enemyFrames[enemy.currentFrame].src;
+            enemy.lastFrameTime = time;
+          }
+        }
+
+        // Remove if off-screen
+        if (enemy.x < -100) {
+          enemy.element.remove();
+          this.enemies.splice(i, 1);
+        }
+      }
+    }
+
+    private checkCollisions() {
+      for (let i = this.enemies.length - 1; i >= 0; i--) {
+        const enemy = this.enemies[i];
+        if (!enemy.dying && this.isColliding(enemy)) {
+          if (this.isStompingOn(enemy)) {
+            this.killEnemy(enemy, i);
+          } else {
+            this.die();
+            return;
+          }
+        }
+      }
+    }
+
+    private isColliding(enemy: EnemyInstance): boolean {
+      const txpRect = this.character.getBoundingClientRect();
+      const enemyRect = enemy.element.getBoundingClientRect();
+
+      const txpBox = {
+        left: txpRect.left + this.txpHitbox.x,
+        top: txpRect.top + this.txpHitbox.y,
+        right: txpRect.left + this.txpHitbox.x + this.txpHitbox.w,
+        bottom: txpRect.top + this.txpHitbox.y + this.txpHitbox.h,
+      };
+
+      const enemyBox = {
+        left: enemyRect.left + enemy.hitbox.x,
+        top: enemyRect.top + enemy.hitbox.y,
+        right: enemyRect.left + enemy.hitbox.x + enemy.hitbox.w,
+        bottom: enemyRect.top + enemy.hitbox.y + enemy.hitbox.h,
+      };
+
+      return txpBox.left < enemyBox.right &&
+        txpBox.right > enemyBox.left &&
+        txpBox.top < enemyBox.bottom &&
+        txpBox.bottom > enemyBox.top;
+    }
+
+    private isStompingOn(enemy: EnemyInstance): boolean {
+      if (!this.isJumping && !this.isFlying) return false;
+
+      const txpRect = this.character.getBoundingClientRect();
+      const enemyRect = enemy.element.getBoundingClientRect();
+
+      const txpBottom = txpRect.top + this.txpHitbox.y + this.txpHitbox.h;
+      const enemyTop = enemyRect.top + enemy.hitbox.y;
+      const enemyHeight = enemy.hitbox.h;
+
+      // TXP muss von oben kommen: Fuesse im oberen 40% der Enemy-Hitbox
+      return txpBottom < enemyTop + enemyHeight * 0.4;
+    }
+
+    private showScorePopup(x: number, y: number, points: number) {
+      const popup = document.createElement("div");
+      popup.textContent = `+${points}P`;
+      popup.style.cssText = `position:fixed;left:${x}px;top:${y}px;transform:translateX(-50%);font-size:1.1rem;font-weight:700;color:var(--color-fg);pointer-events:none;z-index:65;white-space:nowrap;letter-spacing:0.08em;transition:transform 0.65s ease-out,opacity 0.65s ease-out;`;
+      document.body.appendChild(popup);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          popup.style.transform = "translateX(-50%) translateY(-56px)";
+          popup.style.opacity = "0";
+        });
+      });
+      setTimeout(() => popup.remove(), 700);
+    }
+
+    private killEnemy(enemy: EnemyInstance, index: number) {
+      enemy.dying = true;
+      enemy.speed = 0;
+
+      // Squash + Fade Death-Animation
+      const el = enemy.element;
+      const enemyRect = el.getBoundingClientRect();
+      el.style.transition = "transform 0.3s ease-out, opacity 0.3s ease-out";
+      el.style.transformOrigin = "bottom center";
+      el.style.transform = "scaleY(0.15) scaleX(1.4)";
+      el.style.opacity = "0";
+
+      const bonus = enemy.points;
+      this.showScorePopup(enemyRect.left + enemyRect.width / 2, enemyRect.top + enemyRect.height / 3, bonus);
+
+      setTimeout(() => {
+        el.remove();
+        const idx = this.enemies.indexOf(enemy);
+        if (idx !== -1) this.enemies.splice(idx, 1);
+      }, 300);
+
+      this.score += bonus;
+      this.scoreAccum += bonus;
+      this.scoreDisplay.textContent = this.formatScore(this.score);
+
+      // Mini-Bounce: Jump-Progress zuruecksetzen, damit animateJumpPosition
+      // natuerlich einen kleinen Bogen zurueck zum Boden macht
+      const bounceTarget = Math.max(this.currentJumpProgress - 0.15, 0.05);
+      this.flyTargetProgress = bounceTarget;
+    }
+
+    private die() {
+      this.isDead = true;
+      this.isJumping = false;
+      this.isFlying = false;
+      this.isSpacePressed = false;
+      this.flyTargetProgress = 0;
+      this.totalFlyPausedTime = 0;
+      this.hasUsedFlyThisJump = false;
+      this.character.style.transform = "";
+
+      this.stopScoreLoop();
+      if (this.gameLoopId) {
+        cancelAnimationFrame(this.gameLoopId);
+        this.gameLoopId = null;
+      }
+
+      this.deathScoreDisplay.textContent = this.formatScore(this.score);
+
+      if (this.score > this.highscore) {
+        this.highscore = this.score;
+        localStorage.setItem("txpHighscore", String(this.highscore));
+        this.highscoreDisplay.textContent = "Neuer Highscore";
+        this.highscoreDisplay.style.opacity = "1";
+      } else {
+        this.highscoreDisplay.textContent = `Highscore \u00A0 ${this.formatScore(this.highscore)}`;
+        this.highscoreDisplay.style.opacity = "0.5";
+      }
+
+      this.deathScreen.style.opacity = "1";
+      this.deathScreen.style.pointerEvents = "auto";
+    }
+
+    private restart() {
+      this.isDead = false;
+      this.isPaused = false;
+      this.isJumping = false;
+      this.isFlying = false;
+      this.isSpacePressed = false;
+      this.flyStartTime = 0;
+      this.flyFreezeProgress = 0;
+      this.currentJumpProgress = 0;
+      this.jumpTotalPausedTime = 0;
+      this.hasUsedFlyThisJump = false;
+      this.flyTargetProgress = 0;
+      this.totalFlyPausedTime = 0;
+      this.character.style.transform = "";
+
+      this.deathScreen.style.opacity = "0";
+      this.deathScreen.style.pointerEvents = "none";
+      this.pauseScreen.style.opacity = "0";
+      this.pauseScreen.style.pointerEvents = "none";
+
+      this.clearEnemies();
+
+      this.score = 1;
+      this.scoreAccum = 1;
+      this.scoreDisplay.textContent = this.formatScore(this.score);
+      this.startScoreLoop();
+
+      // Resume walk animation (mit Base-FPS)
+      const walkFrames = this.cachedAnimations.get("walk");
+      if (walkFrames) {
+        this.playAnimation(walkFrames, this.baseWalkFPS, true, 12);
+      }
+
+      this.distanceSinceLastSpawn = 0;
+      this.nextSpawnGap = this.getNextSpawnGap();
+      this.startGameLoop();
+    }
+
+    private clearEnemies() {
+      for (const enemy of this.enemies) {
+        enemy.element.remove();
+      }
+      this.enemies = [];
+    }
+
+    private pause() {
+      if (this.isPaused || this.isDead || !this.hasJumpedOnce) return;
+      this.isPaused = true;
+
+      // Stop score counter
+      this.stopScoreLoop();
+
+      // Stop game loop (spawning happens inside)
+      if (this.gameLoopId) {
+        cancelAnimationFrame(this.gameLoopId);
+        this.gameLoopId = null;
+      }
+
+      // Stop runner animation (but not character/jump animation - they pause themselves)
+      if (this.runnerAnimationId) {
+        cancelAnimationFrame(this.runnerAnimationId);
+        this.runnerAnimationId = null;
+      }
+
+      // Note: Character animation and jump position animation are NOT cancelled
+      // They will pause themselves by checking this.isPaused in their loops
+
+      // Show pause screen
+      this.pauseScreen.style.opacity = "1";
+      this.pauseScreen.style.pointerEvents = "auto";
+    }
+
+    private resume() {
+      if (!this.isPaused) return;
+      this.isPaused = false;
+
+      // Hide pause screen
+      this.pauseScreen.style.opacity = "0";
+      this.pauseScreen.style.pointerEvents = "none";
+
+      // Resume score counter
+      this.startScoreLoop();
+
+      // Note: Walk/Jump animation resumes automatically via playAnimation() pause logic
+
+      // Resume runner animation (mit dynamischer Geschwindigkeit)
+      let lastTime = performance.now();
+
+      const animateLeft = (time: number) => {
+        if (!this.isActive || !this.isRunning || this.isPaused) return;
+
+        const delta = (time - lastTime) / 1000;
+        lastTime = time;
+
+        // Scroll-Geschwindigkeit steigt mit Score
+        const scrollSpeed = this.getCurrentPlatformScrollSpeed();
+        this.totalLeftExtension += scrollSpeed * delta;
+
+        // Move left and scale more to keep right edge in place
+        const additionalScale = this.totalLeftExtension / this.platformStartWidth;
+        const totalScale = this.scaleAfterPhase1 + additionalScale;
+
+        this.platform.style.transform = `translateX(-${this.totalLeftExtension}px) scaleX(${totalScale})`;
+
+        this.runnerAnimationId = requestAnimationFrame(animateLeft);
+      };
+
+      this.runnerAnimationId = requestAnimationFrame(animateLeft);
+
+      // Resume game loop (spawning happens inside)
+      this.distanceSinceLastSpawn = 0;
+      this.nextSpawnGap = this.getNextSpawnGap();
+      this.startGameLoop();
+    }
+
+    private toggleHitboxes() {
+      this.showHitboxes = !this.showHitboxes;
+
+      if (this.showHitboxes) {
+        // Add TXP hitbox overlay
+        if (!this.txpHitboxEl) {
+          this.txpHitboxEl = this.addHitboxOverlay(this.character, this.txpHitbox);
+        }
+        this.txpHitboxEl.style.display = "block";
+        // Add to existing enemies
+        for (const enemy of this.enemies) {
+          if (!enemy.element.querySelector(".txp-hitbox")) {
+            this.addHitboxOverlay(enemy.element, enemy.hitbox);
+          }
+        }
+      } else {
+        if (this.txpHitboxEl) {
+          this.txpHitboxEl.style.display = "none";
+        }
+        for (const enemy of this.enemies) {
+          const hb = enemy.element.querySelector(".txp-hitbox") as HTMLElement;
+          if (hb) hb.style.display = "none";
+        }
+      }
+    }
+
+    private addHitboxOverlay(parent: HTMLElement, hitbox: { x: number; y: number; w: number; h: number }): HTMLDivElement {
+      const overlay = document.createElement("div");
+      overlay.className = "txp-hitbox";
+      overlay.style.cssText = `position:absolute;left:${hitbox.x}px;top:${hitbox.y}px;width:${hitbox.w}px;height:${hitbox.h}px;border:1.5px solid var(--color-fg);opacity:0.4;pointer-events:none;box-sizing:border-box;`;
+      parent.appendChild(overlay);
+      return overlay;
+    }
+
+    private stopRunnerMode() {
+      this.isRunning = false;
+      this.isJumping = false;
+      this.isPaused = false;
+      this.isFlying = false;
+      this.isSpacePressed = false;
+      this.flyStartTime = 0;
+      this.flyFreezeProgress = 0;
+      this.currentJumpProgress = 0;
+      this.jumpTotalPausedTime = 0;
+      this.hasUsedFlyThisJump = false;
+      this.jumpStartTime = 0;
+      this.jumpDelayDuration = 0;
+      this.jumpDurationWithoutDelay = 0;
+      this.flyTargetProgress = 0;
+      this.totalFlyPausedTime = 0;
+      this.character.style.transform = "";
+      if (this.runnerAnimationId) {
+        cancelAnimationFrame(this.runnerAnimationId);
+        this.runnerAnimationId = null;
+      }
+      if (this.jumpHintTimeout) {
+        clearTimeout(this.jumpHintTimeout);
+        this.jumpHintTimeout = null;
+      }
+      window.removeEventListener("keydown", this.boundHandleKeydown);
+      window.removeEventListener("keyup", this.boundHandleKeyup);
+      this.groundOffset = 0;
+      this.totalLeftExtension = 0;
+      this.scaleAfterPhase1 = 0;
+      this.runnerGround.style.opacity = "0";
+      this.runnerGround.style.transform = "translateX(-50vw)";
+      // Reset platform styles
+      this.platform.style.opacity = "";
+      this.platform.style.borderRadius = "";
+      this.platform.style.transformOrigin = "";
+      this.platform.style.transform = "";
+      // Reset runner text
+      this.heroTextRunner.style.opacity = "0";
+      this.heroTextRunner.style.transform = "translateY(2rem)";
+      // Reset jump text
+      this.heroTextJump.style.opacity = "0";
+      this.heroTextJump.style.transform = "translateY(2rem)";
+      // Reset score
+      this.stopScoreLoop();
+      this.scoreAccum = 0;
+      this.score = 0;
+      this.hasJumpedOnce = false;
+      this.heroTextScore.style.opacity = "0";
+      this.heroTextScore.style.transform = "translateY(2rem)";
+      this.scoreDisplay.textContent = "0001";
+      // Clear enemies and game loop
+      this.clearEnemies();
+      if (this.gameLoopId) {
+        cancelAnimationFrame(this.gameLoopId);
+        this.gameLoopId = null;
+      }
+      this.distanceSinceLastSpawn = 0;
+      this.nextSpawnGap = 0;
+      this.isDead = false;
+      this.deathScreen.style.opacity = "0";
+      this.deathScreen.style.pointerEvents = "none";
+      this.pauseScreen.style.opacity = "0";
+      this.pauseScreen.style.pointerEvents = "none";
+      this.showHitboxes = false;
+      if (this.txpHitboxEl) {
+        this.txpHitboxEl.remove();
+        this.txpHitboxEl = null;
+      }
+    }
+
+    private async talk() {
+      if (this.textState >= 2) return;
+
+      // Start talk animation (non-blocking)
+      this.playTalkAnimation();
+
+      // Switch text based on current state
+      if (this.textState === 0) {
+        // Switch to TXP text
+        this.heroTextTil.style.opacity = "0";
+        this.heroTextTil.style.transform = "translateY(-2rem)";
+        setTimeout(() => {
+          this.heroTextTXP.style.opacity = "1";
+          this.heroTextTXP.style.transform = "translateY(0)";
+        }, 150);
+        this.textState = 1;
+      } else if (this.textState === 1) {
+        // Switch to final text
+        this.heroTextTXP.style.opacity = "0";
+        this.heroTextTXP.style.transform = "translateY(-2rem)";
+        setTimeout(() => {
+          this.heroTextFinal.style.opacity = "1";
+          this.heroTextFinal.style.transform = "translateY(0)";
+        }, 150);
+        this.textState = 2;
+      }
+    }
+
+    private async playTalkAnimation() {
+      // Load talk animation
+      let talkFrames = this.cachedAnimations.get("talk");
+      if (!talkFrames) {
+        talkFrames = await preloadAnimation("talk");
+        this.cachedAnimations.set("talk", talkFrames);
+      }
+
+      // Play talk animation (2 loops)
+      await this.playAnimation(talkFrames, 24, false);
+      await this.playAnimation(talkFrames, 24, false);
+
+      // Return to idle
+      let idleFrames = this.cachedAnimations.get("idle");
+      if (!idleFrames) {
+        idleFrames = await preloadAnimation("idle");
+        this.cachedAnimations.set("idle", idleFrames);
+      }
+      if (this.isActive) {
+        this.playAnimation(idleFrames, 24, true);
+      }
+    }
+
+    private updatePosition() {
+      const platformRect = this.platformContainer.getBoundingClientRect();
+      const targetX = platformRect.left + platformRect.width / 2 - 45;
+      const targetY = platformRect.top - 86;
+      this.character.style.left = `${targetX}px`;
+      this.character.style.top = `${targetY}px`;
+    }
+
+    async activate() {
+      if (this.isActive) {
+        this.deactivate();
+        return;
+      }
+
+      this.isActive = true;
+
+      // Get button position
+      const txpButton = document.getElementById("txpTrigger");
+      if (!txpButton) return;
+
+      const buttonRect = txpButton.getBoundingClientRect();
+      const platformRect = this.platformContainer.getBoundingClientRect();
+
+      // Calculate target position (centered above platform)
+      const targetX = platformRect.left + platformRect.width / 2 - 45;
+      const targetY = platformRect.top - 86;
+
+      // Start position (at button)
+      const startX = buttonRect.left + buttonRect.width / 2 - 45;
+      const startY = buttonRect.top + buttonRect.height / 2 - 45;
+
+      // Load jump animation first (before showing character)
+      let jumpFrames = this.cachedAnimations.get("jump");
+      if (!jumpFrames) {
+        jumpFrames = await preloadAnimation("jump");
+        this.cachedAnimations.set("jump", jumpFrames);
+      }
+
+      // Set first frame before showing character
+      this.sprite.src = jumpFrames[0].src;
+
+      // Position character at button (flipped to face flight direction)
+      this.character.style.left = `${startX}px`;
+      this.character.style.top = `${startY}px`;
+      this.character.style.transition = "none";
+      this.sprite.style.transform = "scaleX(-1)";
+      this.character.classList.remove("opacity-0");
+      this.character.classList.add("opacity-100");
+
+      // Make character clickable immediately
+      this.character.style.pointerEvents = "auto";
+      this.character.style.cursor = "pointer";
+
+      // Show platform
+      setTimeout(() => {
+        this.platform.classList.remove("scale-x-0");
+        this.platform.classList.add("scale-x-100");
+      }, 50);
+
+      // Flight should be shorter - land at ~60% of animation
+      const jumpFps = 18;
+      const animationDuration = (jumpFrames.length / jumpFps) * 1000;
+      const flightDuration = animationDuration * 0.6;
+
+      // Start sprite animation
+      const spritePromise = this.playAnimation(jumpFrames, jumpFps, false);
+
+      // Flip back 0.5s before landing
+      setTimeout(() => {
+        if (this.isActive) {
+          this.sprite.style.transform = "scaleX(1)";
+        }
+      }, flightDuration - 500);
+
+      // Fly to platform (lands earlier)
+      await this.flyToTarget(startX, startY, targetX, targetY, flightDuration);
+      this.isLanded = true;
+
+      // Wait for sprite animation to finish
+      await spritePromise;
+
+      // Switch to idle
+      let idleFrames = this.cachedAnimations.get("idle");
+      if (!idleFrames) {
+        idleFrames = await preloadAnimation("idle");
+        this.cachedAnimations.set("idle", idleFrames);
+      }
+
+      if (this.isActive) {
+        this.playAnimation(idleFrames, 24, true);
+        // Start hint timer after landing
+        this.startHintTimer();
+      }
+    }
+
+    private flyToTarget(startX: number, startY: number, endX: number, endY: number, duration: number): Promise<void> {
+      return new Promise((resolve) => {
+        const startTime = performance.now();
+
+        const animate = (currentTime: number) => {
+          if (!this.isActive) {
+            resolve();
+            return;
+          }
+
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Smooth easing - slow start, accelerate in middle, slow end
+          const easeInOutQuart = progress < 0.5
+            ? 8 * progress * progress * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 4) / 2;
+
+          // Calculate current position with arc
+          const currentX = startX + (endX - startX) * easeInOutQuart;
+
+          // Add arc to Y position (parabola)
+          const arcHeight = -120;
+          const arcProgress = progress * 2 - 1;
+          const arc = arcHeight * (1 - arcProgress * arcProgress);
+          const linearY = startY + (endY - startY) * easeInOutQuart;
+          const currentY = linearY + arc;
+
+          this.character.style.left = `${currentX}px`;
+          this.character.style.top = `${currentY}px`;
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            resolve();
+          }
+        };
+
+        requestAnimationFrame(animate);
+      });
+    }
+
+    deactivate() {
+      this.isActive = false;
+      this.isLanded = false;
+      this.cancelHintTimer();
+      this.hideHint();
+      this.stopRunnerMode();
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+
+      // Reset all texts to initial state
+      if (this.textState > 0) {
+        this.heroTextTXP.style.opacity = "0";
+        this.heroTextTXP.style.transform = "translateY(2rem)";
+        this.heroTextFinal.style.opacity = "0";
+        this.heroTextFinal.style.transform = "translateY(2rem)";
+        this.heroTextTil.style.opacity = "1";
+        this.heroTextTil.style.transform = "translateY(0)";
+        this.textState = 0;
+      }
+
+      // Hide platform
+      this.platform.classList.remove("scale-x-100");
+      this.platform.classList.add("scale-x-0");
+
+      // Hide character and make non-clickable
+      this.character.style.pointerEvents = "none";
+      this.character.style.cursor = "";
+      this.character.classList.remove("opacity-100");
+      this.character.classList.add("opacity-0");
+
+      setTimeout(() => {
+        this.sprite.src = "";
+        this.sprite.style.transform = "";
+      }, 300);
+    }
+
+    private playAnimation(frames: HTMLImageElement[], baseFPS: number, loop: boolean, startFrame: number = 0): Promise<void> {
+      return new Promise((resolve) => {
+        this.currentFrames = frames;
+        this.currentFrame = startFrame;
+        this.fps = baseFPS; // Wird bei Walk-Animation dynamisch überschrieben
+        this.lastFrameTime = performance.now();
+
+        if (this.animationId) {
+          cancelAnimationFrame(this.animationId);
+        }
+
+        let pauseStartTime = 0;
+        const isWalkAnimation = frames === this.cachedAnimations.get("walk");
+
+        const animate = (time: number) => {
+          if (!this.isActive) {
+            resolve();
+            return;
+          }
+
+          // Handle pause
+          if (this.isPaused) {
+            if (pauseStartTime === 0) {
+              pauseStartTime = time;
+            }
+            this.animationId = requestAnimationFrame(animate);
+            return;
+          } else if (pauseStartTime > 0) {
+            // Adjust lastFrameTime to compensate for pause duration
+            const pauseDuration = time - pauseStartTime;
+            this.lastFrameTime += pauseDuration;
+            pauseStartTime = 0;
+          }
+
+          // Walk-Animation FPS steigt mit Score
+          const currentFPS = isWalkAnimation && this.isRunning ? this.getCurrentWalkFPS() : baseFPS;
+          const elapsed = time - this.lastFrameTime;
+          const frameInterval = 1000 / currentFPS;
+
+          if (elapsed >= frameInterval) {
+            if (isWalkAnimation && this.isRunning) {
+              // Multi-frame skip so high FPS keeps visually accelerating past the display refresh cap
+              const framesToAdvance = Math.max(1, Math.floor(elapsed / frameInterval));
+              this.currentFrame = (this.currentFrame + framesToAdvance) % this.currentFrames.length;
+              this.sprite.src = this.currentFrames[this.currentFrame].src;
+            } else {
+              this.sprite.src = this.currentFrames[this.currentFrame].src;
+              this.currentFrame++;
+
+              if (this.currentFrame >= this.currentFrames.length) {
+                if (loop) {
+                  this.currentFrame = 0;
+                } else {
+                  resolve();
+                  return;
+                }
+              }
+            }
+
+            this.lastFrameTime = time - (elapsed % frameInterval);
+          }
+
+          this.animationId = requestAnimationFrame(animate);
+        };
+
+        this.animationId = requestAnimationFrame(animate);
+      });
+    }
+  }
+
+  const animator = new TXPAnimator();
+  window.addEventListener("txp:activate", () => {
+    animator.activate();
+  });
+</script>

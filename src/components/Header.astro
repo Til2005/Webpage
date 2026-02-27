@@ -1,0 +1,80 @@
+---
+import DropdownNav from "./DropdownNav.astro";
+import LanguageToggle from "./LanguageToggle.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+
+interface Props {
+  simple?: boolean;
+}
+
+const { simple = false } = Astro.props;
+---
+
+<header id="smartHeader" class="header" role="banner">
+  <!-- Left side: optional slot for app-specific content -->
+  <div class="header-left">
+    <slot name="left" />
+  </div>
+
+  <!-- Right side: theme + lang + nav -->
+  <div class="header-right">
+    <ThemeToggle />
+    <LanguageToggle />
+    <DropdownNav simple={simple} />
+  </div>
+</header>
+
+<script>
+  (function() {
+    const header = document.getElementById("smartHeader");
+    if (!header) return;
+
+    const headerHeight = 64;
+    let lastScrollTop = 0;
+    let scrollTicking = false;
+    let mouseTicking = false;
+
+    function hideHeader() {
+      header.classList.add("header-hidden");
+    }
+    function showHeader() {
+      header.classList.remove("header-hidden");
+    }
+
+    function handleScroll() {
+      const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+
+      if (currentScrollTop > headerHeight * 2) {
+        if (currentScrollTop > lastScrollTop) {
+          hideHeader();
+        } else {
+          showHeader();
+        }
+      } else {
+        showHeader();
+      }
+
+      lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
+      scrollTicking = false;
+    }
+
+    window.addEventListener("scroll", function() {
+      if (!scrollTicking) {
+        requestAnimationFrame(handleScroll);
+        scrollTicking = true;
+      }
+    }, { passive: true });
+
+    window.addEventListener("mousemove", function(e) {
+      if (!mouseTicking) {
+        requestAnimationFrame(function() {
+          if (e.clientY < 100 && header.classList.contains("header-hidden") && window.scrollY > headerHeight) {
+            showHeader();
+          }
+          mouseTicking = false;
+        });
+        mouseTicking = true;
+      }
+    }, { passive: true });
+  })();
+</script>

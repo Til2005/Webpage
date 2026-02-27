@@ -1,0 +1,27 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import AppLauncherItem from "../components/AppLauncher/AppLauncherItem.astro";
+import { apps } from "../data/apps";
+---
+
+<BaseLayout>
+  <Header simple={true} />
+  <main id="main" class="min-h-screen flex flex-col items-center justify-center bg-[var(--color-bg)] px-8 pt-16">
+    <h1 class="text-4xl font-bold mb-12 text-center">Web Apps</h1>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8 max-w-4xl w-full mx-auto">
+      {apps.map((app) => (
+        <AppLauncherItem
+          id={app.id}
+          name={app.name}
+          nameEn={app.nameEn}
+          description={app.description}
+          descriptionEn={app.descriptionEn}
+          icon={app.icon}
+          href={app.href}
+          comingSoon={app.comingSoon}
+        />
+      ))}
+    </div>
+  </main>
+</BaseLayout>

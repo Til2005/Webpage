@@ -1,0 +1,115 @@
+---
+interface Props {
+  id: string;
+  label: string;
+  labelEn?: string;
+  min: number;
+  max: number;
+  value: number;
+  step?: number;
+  unit?: string;
+}
+
+const { id, label, labelEn, min, max, value, step = 1, unit = "" } = Astro.props;
+---
+
+<div class="txfe-slider" data-slider-id={id}>
+  <div class="flex justify-between items-center mb-3">
+    <label
+      for={id}
+      class="text-base font-medium"
+      data-label-de={label}
+      data-label-en={labelEn || label}
+    >
+      {label}
+    </label>
+    <span class="txfe-slider-value text-base font-medium tabular-nums">
+      {value}{unit}
+    </span>
+  </div>
+  <div class="relative h-3">
+    <div class="txfe-slider-track"></div>
+    <div
+      class="txfe-slider-fill"
+      style={`width: ${((value - min) / (max - min)) * 100}%`}
+    ></div>
+    <input
+      type="range"
+      id={id}
+      name={id}
+      min={min}
+      max={max}
+      value={value}
+      step={step}
+      class="txfe-slider-input"
+      data-unit={unit}
+    />
+    <div
+      class="txfe-slider-thumb"
+      style={`left: calc(${((value - min) / (max - min)) * 100}% - 0.75rem)`}
+    ></div>
+  </div>
+</div>
+
+<style>
+  .txfe-slider {
+    padding: 0.75rem 0;
+  }
+
+  .txfe-slider-track {
+    position: absolute;
+    inset: 0;
+    background-color: color-mix(in srgb, var(--color-fg) 12%, transparent);
+    border-radius: 9999px;
+  }
+
+  .txfe-slider-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background-color: var(--color-fg);
+    border-radius: 9999px;
+    transition: width 0.05s ease;
+  }
+
+  .txfe-slider-input {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 2.75rem;
+    opacity: 0;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .txfe-slider-thumb {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: var(--color-fg);
+    border-radius: 50%;
+    pointer-events: none;
+    transition: transform 0.1s ease, left 0.05s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .txfe-slider-input:hover + .txfe-slider-thumb,
+  .txfe-slider-input:focus + .txfe-slider-thumb {
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .txfe-slider-input:focus-visible + .txfe-slider-thumb {
+    outline: 2px solid var(--color-fg);
+    outline-offset: 4px;
+  }
+
+  [data-theme="dark"] .txfe-slider-thumb {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+</style>

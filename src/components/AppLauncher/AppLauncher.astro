@@ -1,0 +1,163 @@
+---
+import { apps } from "../../data/apps";
+import AppLauncherItem from "./AppLauncherItem.astro";
+import { translations } from "../../data/i18n";
+
+const t = translations.de;
+---
+
+<div
+  id="appLauncher"
+  class="app-launcher fixed inset-0 z-[100] hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="appLauncherTitle"
+>
+  <!-- Backdrop -->
+  <div class="app-launcher-backdrop absolute inset-0 bg-[var(--color-bg)]/80 backdrop-blur-md"></div>
+
+  <!-- Content -->
+  <div class="app-launcher-content relative z-10 w-full flex flex-col items-center justify-center min-h-screen p-8">
+    <!-- Close button -->
+    <button
+      id="appLauncherClose"
+      class="absolute top-8 right-8 w-12 h-12 flex items-center justify-center rounded-full hover:bg-[var(--color-fg)]/10 transition-colors"
+      aria-label="Schließen"
+    >
+      <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Title -->
+    <h2
+      id="appLauncherTitle"
+      class="text-4xl font-bold mb-12 text-center"
+      data-title-de="Web Apps"
+      data-title-en="Web Apps"
+    >
+      Web Apps
+    </h2>
+
+    <!-- Apps Grid -->
+    <div class="app-launcher-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8 max-w-4xl mx-auto">
+      {apps.map((app) => (
+        <AppLauncherItem
+          id={app.id}
+          name={app.name}
+          nameEn={app.nameEn}
+          description={app.description}
+          descriptionEn={app.descriptionEn}
+          icon={app.icon}
+          href={app.href}
+          comingSoon={app.comingSoon}
+        />
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const launcher = document.getElementById("appLauncher");
+    const closeBtn = document.getElementById("appLauncherClose");
+    const backdrop = launcher?.querySelector(".app-launcher-backdrop");
+
+    if (!launcher) return;
+
+    function open() {
+      launcher!.classList.remove("hidden");
+      launcher!.classList.add("flex");
+      document.body.style.overflow = "hidden";
+      // Focus close button
+      closeBtn?.focus();
+    }
+
+    function close() {
+      launcher!.classList.add("hidden");
+      launcher!.classList.remove("flex");
+      document.body.style.overflow = "";
+    }
+
+    // Listen for open event
+    window.addEventListener("app-launcher:open", open);
+
+    // Close button
+    closeBtn?.addEventListener("click", close);
+
+    // Click on backdrop
+    backdrop?.addEventListener("click", close);
+
+    // ESC key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !launcher!.classList.contains("hidden")) {
+        close();
+      }
+    });
+
+    // Close when clicking an app (except coming soon)
+    launcher.querySelectorAll(".app-launcher-item:not([aria-disabled='true'])").forEach((item) => {
+      item.addEventListener("click", () => {
+        close();
+      });
+    });
+
+    // Update language
+    function updateLanguage(lang: "de" | "en") {
+      const title = launcher!.querySelector("#appLauncherTitle") as HTMLElement;
+      if (title) {
+        title.textContent = title.dataset[`title${lang === "de" ? "De" : "En"}`] || title.textContent;
+      }
+
+      launcher!.querySelectorAll(".app-launcher-item").forEach((item) => {
+        const nameEl = item.querySelector(".app-name") as HTMLElement;
+        const descEl = item.querySelector(".app-description") as HTMLElement;
+        if (nameEl) {
+          nameEl.textContent = nameEl.dataset[`name${lang === "de" ? "De" : "En"}`] || nameEl.textContent;
+        }
+        if (descEl) {
+          descEl.textContent = descEl.dataset[`desc${lang === "de" ? "De" : "En"}`] || descEl.textContent;
+        }
+      });
+    }
+
+    // Listen for language changes
+    window.addEventListener("language:change", (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.lang) {
+        updateLanguage(detail.lang);
+      }
+    });
+  })();
+</script>
+
+<style>
+  .app-launcher {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .app-launcher-content {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

@@ -1,0 +1,61 @@
+---
+interface Tab {
+  id: string;
+  label: string;
+  labelEn: string;
+}
+
+const tabs: Tab[] = [
+  { id: "filter", label: "Filter", labelEn: "Filter" },
+  { id: "crop", label: "Zuschnitt", labelEn: "Crop" },
+  { id: "design", label: "Design", labelEn: "Design" },
+];
+---
+
+<div class="flex gap-2" role="tablist">
+  {tabs.map((tab, index) => (
+    <button
+      id={`txfeTab-${tab.id}`}
+      class:list={[
+        "txfe-tab",
+        index === 0 ? "txfe-tab-active" : ""
+      ]}
+      role="tab"
+      aria-selected={index === 0 ? "true" : "false"}
+      aria-controls={`txfePanel-${tab.id}`}
+      data-tab={tab.id}
+      data-label-de={tab.label}
+      data-label-en={tab.labelEn}
+    >
+      {tab.label}
+    </button>
+  ))}
+</div>
+
+<style>
+  .txfe-tab {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    border-radius: 9999px;
+    color: var(--color-muted);
+    background-color: transparent;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .txfe-tab:hover:not(.txfe-tab-active) {
+    background-color: color-mix(in srgb, var(--color-fg) 8%, transparent);
+    color: var(--color-fg);
+  }
+
+  .txfe-tab-active {
+    background-color: var(--color-fg);
+    color: var(--color-bg);
+  }
+
+  .txfe-tab:focus-visible {
+    outline: 2px solid var(--color-fg);
+    outline-offset: 2px;
+  }
+
+</style>

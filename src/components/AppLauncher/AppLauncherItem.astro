@@ -1,0 +1,62 @@
+---
+interface Props {
+  id: string;
+  name: string;
+  nameEn: string;
+  description: string;
+  descriptionEn: string;
+  icon: string;
+  href: string;
+  comingSoon?: boolean;
+}
+
+const { id, name, nameEn, description, descriptionEn, icon, href, comingSoon } = Astro.props;
+---
+
+<a
+  href={comingSoon ? undefined : href}
+  class:list={[
+    "app-launcher-item",
+    "flex flex-col items-center gap-4 p-6 rounded-3xl transition-all duration-300",
+    comingSoon
+      ? "opacity-50 cursor-not-allowed"
+      : "hover:bg-[var(--color-fg)]/10 cursor-pointer"
+  ]}
+  data-app-id={id}
+  aria-disabled={comingSoon ? "true" : undefined}
+>
+  <div class="app-icon w-24 h-24 flex items-center justify-center rounded-3xl bg-[var(--color-border)] transition-transform duration-300">
+    <img
+      src={icon}
+      alt=""
+      aria-hidden="true"
+      class="w-14 h-14 app-icon-img"
+    />
+  </div>
+  <div class="text-center">
+    <span
+      class="app-name block font-semibold text-lg text-[var(--color-fg)]"
+      data-name-de={name}
+      data-name-en={nameEn}
+    >
+      {name}
+    </span>
+    <span
+      class="app-description block text-sm text-[var(--color-muted)] mt-1"
+      data-desc-de={description}
+      data-desc-en={descriptionEn}
+    >
+      {description}
+    </span>
+  </div>
+</a>
+
+<style>
+  .app-launcher-item:not([aria-disabled="true"]):hover .app-icon {
+    transform: scale(1.1);
+  }
+
+  [data-theme="dark"] .app-icon-img {
+    filter: brightness(0) invert(1);
+  }
+</style>

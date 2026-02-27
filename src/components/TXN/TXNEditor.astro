@@ -1,0 +1,232 @@
+---
+// TXN Editor — Toolbar + contenteditable + status bar
+---
+
+<!-- Hidden file inputs -->
+<input type="file" id="txnImageInput" accept=".png,.jpg,.jpeg,.webp,.gif,.svg" multiple class="sr-only" aria-hidden="true">
+<input type="file" id="txnVideoInput" accept=".mp4,.mov,.mkv,.webm" multiple class="sr-only" aria-hidden="true">
+<input type="file" id="txnImportInput" accept=".txt,.md,.markdown,.docx,.doc" multiple class="sr-only" aria-hidden="true">
+<input type="color" id="txnTextColor" value="#000000" class="sr-only" aria-hidden="true">
+<input type="color" id="txnHighlightColor" value="#ffd700" class="sr-only" aria-hidden="true">
+
+<div class="txn-editor-area" id="txnEditorArea">
+  <!-- Title row (always visible — input+pin hidden when no note active) -->
+  <div class="txn-title-row" id="txnTitleRow">
+    <input
+      id="txnNoteTitle"
+      class="txn-title-input"
+      type="text"
+      placeholder="Titel…"
+      autocomplete="off"
+      spellcheck="true"
+      aria-label="Notiz-Titel"
+    >
+    <div class="txn-title-actions">
+      <button id="txnPinBtn" class="txn-icon-btn" title="Anpinnen" aria-pressed="false" aria-label="Notiz anpinnen">
+        <span class="txn-pin-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 17v5"/>
+            <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1 1 1 0 0 1 1 1z"/>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Cloud dropdown -->
+      <div class="txn-cloud-wrap" role="none">
+        <button id="txnCloudBtn" class="txfe-action-btn" aria-haspopup="true" aria-expanded="false">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          </svg>
+          TXC
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div id="txnCloudMenu" class="txn-cloud-menu" role="menu">
+          <button id="txnCloudUploadBtn" role="menuitem">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="16 16 12 12 8 16"/>
+              <line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+            </svg>
+            In TXC hochladen
+          </button>
+          <button id="txnCloudLoadBtn" role="menuitem">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="8 16 12 20 16 16"/>
+              <line x1="12" y1="20" x2="12" y2="11"/>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+            </svg>
+            Von TXC laden
+          </button>
+          <div class="txn-cloud-menu-sep" role="separator" aria-hidden="true"></div>
+          <button id="txnCloudMediaBtn" role="menuitem">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            Medien von Cloud einfügen
+          </button>
+        </div>
+      </div>
+
+      <!-- Export dropdown -->
+      <div class="txn-export-wrap" role="none">
+        <button id="txnExportBtn" class="txfe-action-btn" aria-haspopup="true" aria-expanded="false">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Exportieren
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div class="txn-export-menu" id="txnExportMenu" role="menu" aria-label="Exportformat wählen">
+          <button data-format="pdf" role="menuitem">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
+            PDF
+          </button>
+          <button data-format="md" role="menuitem">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            Markdown
+          </button>
+          <button data-format="txt" role="menuitem">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg>
+            Plain Text
+          </button>
+          <button data-format="docx" role="menuitem">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            DOCX
+          </button>
+        </div>
+      </div>
+
+      <button id="txnImportBtn" class="txfe-action-btn" aria-label="Datei importieren">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Importieren
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="txn-empty-state" id="txnEmptyState" aria-label="Keine Notiz geöffnet">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="12" y1="18" x2="12" y2="12"/>
+      <line x1="9" y1="15" x2="15" y2="15"/>
+    </svg>
+    <p>Wähle eine Notiz aus oder erstelle eine neue</p>
+    <button id="txnNewNoteEmpty" class="txfe-action-btn-primary">Neue Notiz</button>
+  </div>
+
+  <!-- Editor wrapper (hidden until note selected) -->
+  <div class="txn-editor-wrapper" id="txnEditorWrapper" style="display:none">
+
+    <!-- Toolbar -->
+    <div class="txn-toolbar" id="txnToolbar" role="toolbar" aria-label="Formatierungsleiste">
+      <!-- Text formatting -->
+      <button data-cmd="bold" class="txn-toolbar-btn" title="Fett (Strg+B)" aria-label="Fett">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+      </button>
+      <button data-cmd="italic" class="txn-toolbar-btn" title="Kursiv (Strg+I)" aria-label="Kursiv">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+      </button>
+      <button data-cmd="underline" class="txn-toolbar-btn" title="Unterstrichen (Strg+U)" aria-label="Unterstrichen">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
+      </button>
+      <button data-cmd="strikeThrough" class="txn-toolbar-btn" title="Durchgestrichen" aria-label="Durchgestrichen">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="12" x2="20" y2="12"/><path d="M17.5 5.5C17 4 15.5 3 13.5 3H10C7.5 3 6 4.5 6 6.5c0 1.5.8 2.7 2 3.5"/><path d="M6.5 18.5C7 20 8.5 21 10.5 21H14c2.5 0 4-1.5 4-3.5 0-1.5-.8-2.7-2-3.5"/></svg>
+      </button>
+
+      <span class="txn-toolbar-sep" aria-hidden="true"></span>
+
+      <!-- Headings -->
+      <button data-cmd="formatBlock" data-value="h1" class="txn-toolbar-btn txn-toolbar-btn--text" title="Überschrift 1" aria-label="Überschrift 1">H1</button>
+      <button data-cmd="formatBlock" data-value="h2" class="txn-toolbar-btn txn-toolbar-btn--text" title="Überschrift 2" aria-label="Überschrift 2">H2</button>
+      <button data-cmd="formatBlock" data-value="h3" class="txn-toolbar-btn txn-toolbar-btn--text" title="Überschrift 3" aria-label="Überschrift 3">H3</button>
+      <button data-cmd="formatBlock" data-value="p" class="txn-toolbar-btn txn-toolbar-btn--text" title="Absatz" aria-label="Absatz">P</button>
+
+      <span class="txn-toolbar-sep" aria-hidden="true"></span>
+
+      <!-- Font size -->
+      <label for="txnFontSize" class="sr-only">Schriftgröße</label>
+      <select id="txnFontSize" class="txn-toolbar-select" title="Schriftgröße" aria-label="Schriftgröße">
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="14" selected>14</option>
+        <option value="16">16</option>
+        <option value="18">18</option>
+        <option value="20">20</option>
+        <option value="24">24</option>
+        <option value="28">28</option>
+        <option value="32">32</option>
+        <option value="48">48</option>
+      </select>
+
+      <span class="txn-toolbar-sep" aria-hidden="true"></span>
+
+      <!-- Text color -->
+      <button id="txnTextColorBtn" class="txn-toolbar-btn txn-toolbar-btn--color" title="Textfarbe" aria-label="Textfarbe wählen">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <text x="12" y="17" font-size="17" font-weight="700" font-family="sans-serif" text-anchor="middle" fill="currentColor">A</text>
+          <rect x="4" y="19.5" width="16" height="3" id="txnTextColorDot" fill="currentColor" rx="1"/>
+        </svg>
+      </button>
+
+      <!-- Highlight color -->
+      <button id="txnHighlightColorBtn" class="txn-toolbar-btn txn-toolbar-btn--color" title="Hervorhebungsfarbe" aria-label="Hervorhebungsfarbe wählen">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        <span id="txnHighlightColorDot" class="txn-color-dot" style="background:#ffd700"></span>
+      </button>
+
+      <span class="txn-toolbar-sep" aria-hidden="true"></span>
+
+      <!-- Media -->
+      <button id="txnInsertImage" class="txn-toolbar-btn" title="Bild einfügen" aria-label="Bild einfügen">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </button>
+      <button id="txnInsertVideo" class="txn-toolbar-btn" title="Video einfügen" aria-label="Video einfügen">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      </button>
+
+      <span class="txn-toolbar-sep" aria-hidden="true"></span>
+
+      <!-- TXFE -->
+      <button id="txnOpenTXFE" class="txn-toolbar-btn txn-toolbar-btn--txfe" title="TXFE Bildeditor öffnen" aria-label="TXFE Bildeditor öffnen">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span class="txn-toolbar-txfe-label">TXFE</span>
+      </button>
+    </div>
+
+    <!-- Content editable -->
+    <div
+      id="txnContent"
+      class="txn-content"
+      contenteditable="true"
+      role="textbox"
+      aria-multiline="true"
+      aria-label="Notizinhalt"
+      spellcheck="true"
+    ></div>
+
+    <!-- Status bar -->
+    <div class="txn-status-bar" aria-live="polite">
+      <span id="txnCreatedAt" class="txn-status-item"></span>
+      <span class="txn-status-dot" aria-hidden="true">·</span>
+      <span id="txnUpdatedAt" class="txn-status-item"></span>
+      <span class="txn-status-dot" aria-hidden="true">·</span>
+      <span id="txnWordCount" class="txn-status-item"></span>
+      <span id="txnSaveStatus" class="txn-status-save"></span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+---
+interface AspectRatio {
+  id: string;
+  label: string;
+  labelEn: string;
+  value: string | null;
+  ratio: number | null;
+}
+
+const aspectRatios: AspectRatio[] = [
+  { id: "original", label: "Original", labelEn: "Original", value: null, ratio: null },
+  { id: "1-1", label: "1:1", labelEn: "1:1", value: "1/1", ratio: 1 },
+  { id: "16-9", label: "16:9", labelEn: "16:9", value: "16/9", ratio: 16/9 },
+  { id: "4-3", label: "4:3", labelEn: "4:3", value: "4/3", ratio: 4/3 },
+  { id: "9-16", label: "9:16", labelEn: "9:16", value: "9/16", ratio: 9/16 },
+];
+---
+
+<div id="txfePanel-crop" class="txfe-panel p-6 hidden" role="tabpanel" aria-labelledby="txfeTab-crop">
+  <div class="max-w-4xl mx-auto space-y-6">
+    <!-- Aspect Ratios -->
+    <div>
+      <label class="block text-sm font-medium mb-4" data-label-de="Seitenverhältnis" data-label-en="Aspect Ratio">
+        Seitenverhältnis
+      </label>
+      <div class="flex flex-wrap gap-3" role="radiogroup" aria-label="Seitenverhältnis">
+        {aspectRatios.map((ratio, index) => (
+          <button
+            class:list={[
+              "txfe-aspect-btn px-5 py-2.5 text-sm font-medium rounded-full border-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-fg)] focus-visible:outline-offset-2",
+              index === 0
+                ? "border-[var(--color-fg)] bg-[var(--color-fg)] text-[var(--color-bg)]"
+                : "border-[var(--color-border)] hover:border-[var(--color-fg)]"
+            ]}
+            role="radio"
+            aria-checked={index === 0 ? "true" : "false"}
+            aria-label={`Seitenverhältnis ${ratio.label}`}
+            data-aspect={ratio.id}
+            data-aspect-value={ratio.value}
+            data-aspect-ratio={ratio.ratio}
+            data-label-de={ratio.label}
+            data-label-en={ratio.labelEn}
+          >
+            {ratio.label}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="text-sm text-[var(--color-muted)] p-4 bg-[var(--color-fg)]/5 rounded-lg">
+      <p data-i18n-de="Wähle ein Seitenverhältnis und verschiebe den Rahmen im Bild, um den Ausschnitt festzulegen. Ziehe an den Ecken, um die Größe anzupassen." data-i18n-en="Select an aspect ratio and drag the frame on the image to set the crop area. Drag the corners to resize.">
+        Wähle ein Seitenverhältnis und verschiebe den Rahmen im Bild, um den Ausschnitt festzulegen. Ziehe an den Ecken, um die Größe anzupassen.
+      </p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-center gap-3">
+      <button
+        id="txfeResetCrop"
+        class="px-5 py-2.5 text-sm font-medium rounded-full border-2 border-[var(--color-border)] hover:border-[var(--color-fg)] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-fg)] focus-visible:outline-offset-2"
+        aria-label="Zuschnitt zurücksetzen"
+      >
+        Zurücksetzen
+      </button>
+      <button
+        id="txfeApplyCrop"
+        class="px-5 py-2.5 text-sm font-medium rounded-full border-2 border-[var(--color-fg)] bg-[var(--color-fg)] text-[var(--color-bg)] hover:opacity-80 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-fg)] focus-visible:outline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed"
+        aria-label="Zuschnitt anwenden"
+        disabled
+      >
+        Anwenden
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+import HeroSection from "../../components/HeroSection.astro";
+import AppLauncher from "../../components/AppLauncher/AppLauncher.astro";
+---
+
+<AppLayout title="TXME — Til Sander" appName="TXME" simpleNav={false}>
+  <Fragment slot="header-left">
+    <a href="/" class="txfe-back-btn">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      <span class="hidden sm:inline">Zurück</span>
+    </a>
+    <span class="txfe-title">TXME</span>
+  </Fragment>
+  <HeroSection />
+  <AppLauncher />
+</AppLayout>

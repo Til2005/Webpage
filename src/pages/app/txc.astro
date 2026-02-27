@@ -1,0 +1,751 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+---
+
+<AppLayout title="TXC — Cloud" description="TXC Cloud-Synchronisation">
+  <Fragment slot="header-left">
+    <a href="/" class="txfe-back-btn">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      <span class="hidden sm:inline">Zurück</span>
+    </a>
+    <span class="txfe-title">TXC</span>
+  </Fragment>
+
+  <div class="txc-app">
+
+    <!-- Loading -->
+    <div id="txcLoading" class="txc-state">
+      <div class="txc-spinner"></div>
+    </div>
+
+    <!-- Sign In -->
+    <div id="txcSignIn" class="txc-state hidden">
+      <button id="txcSignInBtn" class="txc-google-btn">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Mit Google anmelden
+      </button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="txcDashboard" class="txc-state hidden">
+
+      <!-- User card -->
+      <div class="txc-user-card">
+        <img id="txcAvatar" class="txc-avatar" src="" alt="Profilbild" />
+        <div class="txc-user-info">
+          <span id="txcUserName" class="txc-user-name"></span>
+          <span id="txcUserEmail" class="txc-user-email"></span>
+        </div>
+        <button id="txcSignOutBtn" class="txc-signout-btn">Abmelden</button>
+      </div>
+
+      <!-- Storage usage -->
+      <div class="txc-storage">
+        <div class="txc-storage-header">
+          <span>Cloud-Speicher</span>
+          <span id="txcStorageText">Wird geladen…</span>
+        </div>
+        <div class="txc-storage-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="txcStorageBar">
+          <div id="txcStorageFill" class="txc-storage-fill"></div>
+        </div>
+        <button id="txcContentsBtn" class="txc-contents-btn">Inhalte anzeigen</button>
+      </div>
+
+
+    </div>
+
+  <!-- Contents modal -->
+  <div id="txcContentsModal" class="txc-modal hidden" role="dialog" aria-modal="true" aria-label="Cloud-Inhalte">
+    <div class="txc-modal-box">
+      <div class="txc-modal-header">
+        <span class="txc-modal-title">Cloud-Inhalte</span>
+        <button id="txcContentsClose" class="txc-modal-close" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="txcContentsUsage" class="txc-contents-usage hidden"></div>
+      <div id="txcContentsList" class="txc-contents-list">
+        <div class="txc-contents-loading"><div class="txc-spinner"></div></div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</AppLayout>
+
+<script>
+  import { supabase } from '../../lib/supabase';
+  import { signInWithGoogle, signOut, getUser } from '../../scripts/txc/authManager';
+  import { getCloudUsage, getCloudContents, getSignedUrl } from '../../scripts/txc/txnSync';
+  import type { User } from '@supabase/supabase-js';
+
+  const elLoading = document.getElementById('txcLoading')!;
+  const elSignIn = document.getElementById('txcSignIn')!;
+  const elDashboard = document.getElementById('txcDashboard')!;
+
+  function show(el: HTMLElement) { el.classList.remove('hidden'); }
+  function hide(el: HTMLElement) { el.classList.add('hidden'); }
+
+  function renderUser(user: User | null) {
+    hide(elLoading);
+    if (user) {
+      const name = user.user_metadata?.full_name ?? user.email ?? '';
+      const email = user.email ?? '';
+      const avatarUrl = user.user_metadata?.avatar_url ?? '';
+
+      document.getElementById('txcUserName')!.textContent = name;
+      document.getElementById('txcUserEmail')!.textContent = email;
+      const avatar = document.getElementById('txcAvatar') as HTMLImageElement;
+      if (avatarUrl) { avatar.src = avatarUrl; avatar.style.display = 'block'; }
+      else { avatar.style.display = 'none'; }
+
+      show(elDashboard);
+      hide(elSignIn);
+      loadUsage();
+    } else {
+      show(elSignIn);
+      hide(elDashboard);
+    }
+  }
+
+  async function loadUsage() {
+    const storageText = document.getElementById('txcStorageText')!;
+    const storageFill = document.getElementById('txcStorageFill') as HTMLElement;
+    const storageBar = document.getElementById('txcStorageBar')!;
+    try {
+      const usage = await getCloudUsage();
+      if (!usage) { storageText.textContent = '—'; return; }
+      const usedMB = usage.usedBytes / (1024 * 1024);
+      const limitMB = usage.limitBytes / (1024 * 1024);
+      const pct = Math.min((usage.usedBytes / usage.limitBytes) * 100, 100);
+      storageText.textContent = `${usedMB.toFixed(1)} MB / ${limitMB.toFixed(0)} MB`;
+      storageFill.style.width = `${pct}%`;
+      storageBar.setAttribute('aria-valuenow', String(Math.round(pct)));
+      if (pct >= 75) storageFill.classList.add('txc-storage-fill--warn');
+    } catch {
+      storageText.textContent = 'Fehler';
+    }
+  }
+
+  getUser().then(user => renderUser(user));
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    renderUser(session?.user ?? null);
+  });
+
+  document.getElementById('txcSignInBtn')?.addEventListener('click', () => {
+    signInWithGoogle();
+  });
+
+  document.getElementById('txcSignOutBtn')?.addEventListener('click', async () => {
+    await signOut();
+    renderUser(null);
+  });
+
+  // ── Contents modal ──────────────────────────────────────────────────────────
+
+  function fmtSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  function esc(s: string): string {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  const modal = document.getElementById('txcContentsModal')!;
+  const contentsList = document.getElementById('txcContentsList')!;
+  const contentsUsage = document.getElementById('txcContentsUsage')!;
+
+  function openModal() {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    loadContents();
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  async function loadContents() {
+    contentsList.innerHTML = '<div class="txc-contents-loading"><div class="txc-spinner"></div></div>';
+    contentsUsage.classList.add('hidden');
+
+    function renderSection(label: string, colorClass: string, items: { name: string; sizeBytes: number; action?: string; actionData?: string }[], totalAll: number): string {
+      if (items.length === 0) return '';
+      const sorted = [...items].sort((a, b) => b.sizeBytes - a.sizeBytes);
+      const sectionTotal = items.reduce((s, i) => s + i.sizeBytes, 0);
+      const rows = sorted.map(item => {
+        const actionAttr = item.action ? ` data-action="${esc(item.action)}" data-path="${esc(item.actionData ?? '')}"` : '';
+        const clickClass = item.action ? ' txc-item-clickable' : '';
+        return `<div class="txc-item-row${clickClass}"${actionAttr}>
+          <span class="txc-item-name">${esc(item.name)}</span>
+          <span class="txc-item-size">${fmtSize(item.sizeBytes)}</span>
+        </div>`;
+      }).join('');
+      const count = items.length;
+      return `<div class="txc-section-card">
+        <div class="txc-section-head">
+          <div class="txc-section-dot ${colorClass}"></div>
+          <span class="txc-section-name">${label}</span>
+          <span class="txc-section-stats">${count} ${count === 1 ? 'Eintrag' : 'Einträge'}</span>
+          <span class="txc-section-size">${fmtSize(sectionTotal)}</span>
+        </div>
+        <div class="txc-section-items">${rows}</div>
+      </div>`;
+    }
+
+    try {
+      const data = await getCloudContents();
+      if (!data) { contentsList.innerHTML = '<p class="txc-contents-empty">Nicht eingeloggt</p>'; return; }
+
+      const noteItems = data.notes.map(n => ({ name: n.title || 'Ohne Titel', sizeBytes: n.sizeBytes, action: 'open-note' as const, actionData: n.id }));
+      const imgItems = data.txfeImages.map(i => ({ name: i.name, sizeBytes: i.sizeBytes, action: 'open-file' as const, actionData: i.storagePath }));
+      const medItems = data.txnMedia.map(m => ({ name: `Mediendatei ${m.index}`, sizeBytes: m.sizeBytes, action: 'open-file' as const, actionData: m.storagePath }));
+
+      const noteTotal = noteItems.reduce((s, i) => s + i.sizeBytes, 0);
+      const imgTotal = imgItems.reduce((s, i) => s + i.sizeBytes, 0);
+      const medTotal = medItems.reduce((s, i) => s + i.sizeBytes, 0);
+      const totalAll = noteTotal + imgTotal + medTotal;
+
+      // Usage bar
+      if (totalAll > 0) {
+        const notePct = (noteTotal / totalAll) * 100;
+        const imgPct = (imgTotal / totalAll) * 100;
+        const medPct = (medTotal / totalAll) * 100;
+        contentsUsage.innerHTML = `
+          <div class="txc-usage-info">
+            <span class="txc-usage-total">${fmtSize(totalAll)}</span>
+            <span class="txc-usage-label">belegt</span>
+          </div>
+          <div class="txc-usage-bar">
+            ${notePct > 0 ? `<div class="txc-usage-seg txc-color-notes" style="width:${notePct}%"></div>` : ''}
+            ${imgPct > 0 ? `<div class="txc-usage-seg txc-color-images" style="width:${imgPct}%"></div>` : ''}
+            ${medPct > 0 ? `<div class="txc-usage-seg txc-color-media" style="width:${medPct}%"></div>` : ''}
+          </div>
+          <div class="txc-usage-legend">
+            ${notePct > 0 ? `<span class="txc-legend-item"><span class="txc-legend-dot txc-color-notes"></span>Notizen</span>` : ''}
+            ${imgPct > 0 ? `<span class="txc-legend-item"><span class="txc-legend-dot txc-color-images"></span>Bilder</span>` : ''}
+            ${medPct > 0 ? `<span class="txc-legend-item"><span class="txc-legend-dot txc-color-media"></span>Medien</span>` : ''}
+          </div>`;
+        contentsUsage.classList.remove('hidden');
+      }
+
+      const html = [
+        renderSection('TXN (Notizen)', 'txc-color-notes', noteItems, totalAll),
+        renderSection('TXFE (Foto Editor)', 'txc-color-images', imgItems, totalAll),
+        renderSection('TXN (Medien)', 'txc-color-media', medItems, totalAll),
+      ].join('');
+
+      contentsList.innerHTML = html || '<p class="txc-contents-empty">Keine Inhalte in der Cloud</p>';
+    } catch {
+      contentsList.innerHTML = '<p class="txc-contents-empty">Fehler beim Laden</p>';
+    }
+  }
+
+  document.getElementById('txcContentsBtn')?.addEventListener('click', openModal);
+  document.getElementById('txcContentsClose')?.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+  // Click handler for items
+  contentsList.addEventListener('click', async (e) => {
+    const row = (e.target as HTMLElement).closest<HTMLElement>('.txc-item-clickable');
+    if (!row) return;
+
+    const action = row.dataset.action;
+    const path = row.dataset.path ?? '';
+
+    // Visual feedback
+    row.classList.add('txc-item-loading');
+
+    try {
+      if (action === 'open-note') {
+        // Open note in TXN with note ID as hash
+        window.open(`/app/txn#note=${path}`, '_blank');
+      } else if (action === 'open-file') {
+        const url = await getSignedUrl(path);
+        if (url) window.open(url, '_blank');
+      }
+    } finally {
+      row.classList.remove('txc-item-loading');
+    }
+  });
+</script>
+
+<style is:global>
+  .txc-app {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg);
+    min-height: calc(100vh - var(--header-height));
+  }
+
+  .txc-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .txc-state.hidden { display: none; }
+
+  /* Spinner */
+  .txc-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-fg);
+    border-radius: 50%;
+    animation: txc-spin 0.8s linear infinite;
+  }
+
+  @keyframes txc-spin { to { transform: rotate(360deg); } }
+
+  /* Google Button */
+  .txc-google-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background: #fff;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    border-radius: 9999px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: box-shadow 0.2s, background 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .txc-google-btn:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+    background: #f8f9fa;
+  }
+
+  .txc-google-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  [data-theme="dark"] .txc-google-btn {
+    background: #2a2a2e;
+    color: #e8eaed;
+    border-color: #5f6368;
+  }
+
+  [data-theme="dark"] .txc-google-btn:hover { background: #35363a; }
+
+  /* User Card */
+  .txc-user-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .txc-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .txc-user-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .txc-user-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-fg);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .txc-user-email {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .txc-signout-btn {
+    flex-shrink: 0;
+    padding: 0.4375rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .txc-signout-btn:hover {
+    color: var(--color-fg);
+    border-color: var(--color-fg);
+  }
+
+  /* Dashboard List */
+  .txc-list {
+    display: flex;
+    flex-direction: row;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .txc-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .txc-item-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-fg);
+    letter-spacing: -0.02em;
+  }
+
+  .txc-item-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+
+  .txc-dot {
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 50%;
+    background: #22c55e;
+    flex-shrink: 0;
+  }
+
+  /* Storage usage */
+  .txc-storage {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .txc-storage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+
+  .txc-storage-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--color-border);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .txc-storage-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--color-fg);
+    border-radius: 9999px;
+    transition: width 0.4s ease;
+  }
+
+  .txc-storage-fill--warn {
+    background: #ef4444;
+  }
+
+  /* Contents button */
+  .txc-contents-btn {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s;
+  }
+
+  .txc-contents-btn:hover { color: var(--color-fg); }
+
+  /* Color tokens for categories */
+  .txc-color-notes { background: #6366f1; }
+  .txc-color-images { background: #f59e0b; }
+  .txc-color-media { background: #10b981; }
+
+  /* Modal overlay */
+  .txc-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 1rem;
+    animation: txc-fade-in 0.15s ease;
+  }
+
+  @keyframes txc-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .txc-modal.hidden { display: none; }
+
+  .txc-modal-box {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: txc-slide-up 0.2s ease;
+  }
+
+  @keyframes txc-slide-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .txc-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+
+  .txc-modal-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-fg);
+  }
+
+  .txc-modal-close {
+    background: none;
+    border: none;
+    padding: 0.375rem;
+    color: var(--color-muted);
+    cursor: pointer;
+    border-radius: 0.5rem;
+    display: flex;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .txc-modal-close:hover {
+    color: var(--color-fg);
+    background: var(--color-border);
+  }
+
+  /* Usage overview */
+  .txc-contents-usage {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+
+  .txc-contents-usage.hidden { display: none; }
+
+  .txc-usage-info {
+    display: flex;
+    align-items: baseline;
+    gap: 0.375rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .txc-usage-total {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-fg);
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .txc-usage-label {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+
+  .txc-usage-bar {
+    display: flex;
+    height: 6px;
+    border-radius: 9999px;
+    overflow: hidden;
+    background: var(--color-border);
+    gap: 2px;
+  }
+
+  .txc-usage-seg {
+    height: 100%;
+    border-radius: 9999px;
+    min-width: 4px;
+    transition: width 0.3s ease;
+  }
+
+  .txc-usage-legend {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.625rem;
+  }
+
+  .txc-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+
+  .txc-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Contents list */
+  .txc-contents-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .txc-contents-loading {
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem;
+  }
+
+  .txc-contents-empty {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    padding: 2.5rem;
+    margin: 0;
+  }
+
+  /* Section cards */
+  .txc-section-card {
+    border-radius: 0.625rem;
+    overflow: hidden;
+  }
+
+  .txc-section-head {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.625rem 0;
+  }
+
+  .txc-section-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .txc-section-name {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-fg);
+  }
+
+  .txc-section-stats {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+
+  .txc-section-size {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+  }
+
+  .txc-section-items {
+    padding: 0 0 0.5rem;
+  }
+
+  .txc-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.3125rem 0 0.3125rem 1.375rem;
+  }
+
+  .txc-item-name {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .txc-item-size {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+  }
+
+  .txc-item-clickable {
+    cursor: pointer;
+    border-radius: 0.375rem;
+    transition: background 0.15s;
+  }
+
+  .txc-item-clickable:hover {
+    background: var(--color-border);
+  }
+
+  .txc-item-clickable:hover .txc-item-name {
+    color: var(--color-fg);
+  }
+
+  .txc-item-loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+</style>

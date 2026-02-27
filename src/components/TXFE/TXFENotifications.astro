@@ -1,0 +1,129 @@
+---
+
+---
+
+<div id="txfeNotifications" class="txfe-notifications" role="status" aria-live="polite" aria-atomic="false"></div>
+
+<style>
+  .txfe-notifications {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+  }
+
+  @media (max-width: 640px) {
+    .txfe-notifications {
+      left: 1rem;
+      right: 1rem;
+    }
+  }
+
+  .txfe-notification {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--color-bg);
+    border: 2px solid var(--color-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-size: 0.875rem;
+    font-weight: 500;
+    pointer-events: auto;
+    animation: txfe-notification-slide-in 0.3s ease-out;
+    max-width: 400px;
+  }
+
+  .txfe-notification.txfe-notification-exit {
+    animation: txfe-notification-slide-out 0.2s ease-in forwards;
+  }
+
+  @keyframes txfe-notification-slide-in {
+    from {
+      transform: translateX(calc(100% + 2rem));
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes txfe-notification-slide-out {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(calc(100% + 2rem));
+      opacity: 0;
+    }
+  }
+
+  .txfe-notification-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .txfe-notification-message {
+    flex: 1;
+    color: var(--color-fg);
+  }
+
+  .txfe-notification-close {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    color: var(--color-muted);
+  }
+
+  .txfe-notification-close:hover {
+    background-color: color-mix(in srgb, var(--color-fg) 10%, transparent);
+    color: var(--color-fg);
+  }
+
+  /* Type-specific styles */
+  .txfe-notification-success {
+    border-color: #22c55e;
+  }
+
+  .txfe-notification-success .txfe-notification-icon {
+    color: #22c55e;
+  }
+
+  .txfe-notification-error {
+    border-color: #ef4444;
+  }
+
+  .txfe-notification-error .txfe-notification-icon {
+    color: #ef4444;
+  }
+
+  .txfe-notification-warning {
+    border-color: #f59e0b;
+  }
+
+  .txfe-notification-warning .txfe-notification-icon {
+    color: #f59e0b;
+  }
+
+  .txfe-notification-info {
+    border-color: #3b82f6;
+  }
+
+  .txfe-notification-info .txfe-notification-icon {
+    color: #3b82f6;
+  }
+</style>

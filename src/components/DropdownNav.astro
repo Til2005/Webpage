@@ -1,0 +1,258 @@
+---
+import { navItems } from "../data/navigation";
+import { translations } from "../data/i18n";
+
+interface Props {
+  simple?: boolean;
+}
+
+const { simple = false } = Astro.props;
+const t = translations.de;
+
+const visibleItems = simple
+  ? navItems.filter((item) => item.label === "Web Apps")
+  : navItems;
+---
+
+<nav class="relative z-50" aria-label={t.navAriaLabel} data-i18n-aria="navAriaLabel">
+  <!-- Menu Toggle Button -->
+  <button
+    id="dropdownToggle"
+    class="flex items-center justify-center w-[2.2rem] h-[2.2rem] mr-[0.65rem] rounded-full hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)] transition duration-500 cursor-pointer"
+    aria-expanded="false"
+    aria-controls="dropdownMenu"
+    aria-label={t.menuAriaLabel}
+    data-i18n-aria="menuAriaLabel"
+  >
+    <div
+      id="menuIcon"
+      class="w-6 h-6 border-2 border-[var(--color-fg)] rounded-full transition-colors duration-500"
+    ></div>
+    <img
+      id="menuAvatar"
+      class="w-[1.9rem] h-[1.9rem] rounded-full object-cover hidden"
+      src=""
+      alt=""
+    />
+  </button>
+
+  <!-- Dropdown Menu -->
+  <div
+    id="dropdownMenu"
+    class="dropdown-menu hidden-menu absolute right-0 top-full pt-4 flex flex-col items-end gap-2 z-50"
+    role="menu"
+  >
+    {visibleItems.map((item) => (
+      item.type === 'launcher' ? (
+        <button
+          class="menu-item menu-item-launcher"
+          role="menuitem"
+          tabindex="-1"
+          data-label-de={item.label}
+          data-label-en={item.labelEn}
+          data-launcher-type={item.type}
+          type="button"
+        >
+          <span class="menu-text">{item.label}</span>
+          <div class="menu-icon-bg"></div>
+          <img src={item.icon} alt="" aria-hidden="true" class="menu-icon-img" />
+        </button>
+      ) : (
+        <a
+          href={item.href}
+          class="menu-item"
+          role="menuitem"
+          tabindex="-1"
+          data-label-de={item.label}
+          data-label-en={item.labelEn}
+        >
+          <span class="menu-text">{item.label}</span>
+          <div class="menu-icon-bg"></div>
+          <img src={item.icon} alt="" aria-hidden="true" class="menu-icon-img" />
+        </a>
+      )
+    ))}
+    <!-- TXP Easter Egg -->
+    {!simple && (
+      <button
+        id="txpTrigger"
+        class="menu-item menu-item-txp"
+        role="menuitem"
+        tabindex="-1"
+        data-label-de="???"
+        data-label-en="???"
+        type="button"
+      >
+        <span class="menu-text">???</span>
+        <div class="menu-icon-bg"></div>
+        <span class="menu-icon-text" aria-hidden="true">TXP</span>
+      </button>
+    )}
+  </div>
+</nav>
+
+<script>
+  (function() {
+    const nav = document.querySelector("nav");
+    const toggle = document.getElementById("dropdownToggle") as HTMLButtonElement | null;
+    const menu = document.getElementById("dropdownMenu");
+    const menuIcon = document.getElementById("menuIcon");
+    if (!nav || !toggle || !menu) return;
+
+    let isOpen = false;
+    let closeTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    const menuItems = Array.from(menu.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]'));
+
+    function open() {
+      if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
+      if (isOpen) return;
+      isOpen = true;
+      menu!.classList.remove("hidden-menu");
+      menu!.classList.add("visible-menu");
+      toggle!.setAttribute("aria-expanded", "true");
+      if (menuIcon) menuIcon.style.backgroundColor = "var(--color-fg)";
+    }
+
+    function close() {
+      closeTimeout = setTimeout(() => {
+        if (!isOpen) return;
+        isOpen = false;
+        menu!.classList.remove("visible-menu");
+        menu!.classList.add("hidden-menu");
+        toggle!.setAttribute("aria-expanded", "false");
+        if (menuIcon) menuIcon.style.backgroundColor = "";
+      }, 300);
+    }
+
+    function toggleMenu() {
+      if (isOpen) {
+        if (closeTimeout) clearTimeout(closeTimeout);
+        isOpen = false;
+        menu!.classList.remove("visible-menu");
+        menu!.classList.add("hidden-menu");
+        toggle!.setAttribute("aria-expanded", "false");
+      } else {
+        open();
+      }
+    }
+
+    // Hover (desktop)
+    nav.addEventListener("mouseenter", open);
+    nav.addEventListener("mouseleave", close);
+
+    // Click → navigate to TXC
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      window.location.href = "/app/txc";
+    });
+
+    // Close on outside click
+    document.addEventListener("click", (e) => {
+      if (isOpen && !nav.contains(e.target as Node)) {
+        if (closeTimeout) clearTimeout(closeTimeout);
+        isOpen = false;
+        menu!.classList.remove("visible-menu");
+        menu!.classList.add("hidden-menu");
+        toggle!.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    // Keyboard navigation
+    toggle.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        if (!isOpen) open();
+        menuItems[0]?.focus();
+      }
+    });
+
+    menu.addEventListener("keydown", (e) => {
+      const currentIndex = menuItems.indexOf(document.activeElement as HTMLAnchorElement);
+
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          if (currentIndex < menuItems.length - 1) menuItems[currentIndex + 1].focus();
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          if (currentIndex > 0) {
+            menuItems[currentIndex - 1].focus();
+          } else {
+            toggle!.focus();
+          }
+          break;
+        case "Escape":
+          e.preventDefault();
+          if (closeTimeout) clearTimeout(closeTimeout);
+          isOpen = false;
+          menu!.classList.remove("visible-menu");
+          menu!.classList.add("hidden-menu");
+          toggle!.setAttribute("aria-expanded", "false");
+            toggle!.focus();
+          break;
+      }
+    });
+
+    // TXP Easter Egg trigger
+    const txpTrigger = document.getElementById("txpTrigger");
+    if (txpTrigger) {
+      txpTrigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        // Close menu
+        if (closeTimeout) clearTimeout(closeTimeout);
+        isOpen = false;
+        menu!.classList.remove("visible-menu");
+        menu!.classList.add("hidden-menu");
+        toggle!.setAttribute("aria-expanded", "false");
+        // Fire custom event
+        window.dispatchEvent(new CustomEvent("txp:activate"));
+      });
+    }
+
+    // Avatar: show Google profile picture when logged in
+    const menuAvatar = document.getElementById("menuAvatar") as HTMLImageElement | null;
+    if (menuIcon && menuAvatar) {
+      import("../lib/supabase").then(({ supabase }) => {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          const url = user?.user_metadata?.avatar_url;
+          if (url) {
+            menuAvatar.src = url;
+            menuAvatar.alt = "Profilbild";
+            menuAvatar.classList.remove("hidden");
+            menuIcon.classList.add("hidden");
+          }
+        });
+        supabase.auth.onAuthStateChange((_event, session) => {
+          const url = session?.user?.user_metadata?.avatar_url;
+          if (url) {
+            menuAvatar.src = url;
+            menuAvatar.alt = "Profilbild";
+            menuAvatar.classList.remove("hidden");
+            menuIcon.classList.add("hidden");
+          } else {
+            menuAvatar.classList.add("hidden");
+            menuIcon.classList.remove("hidden");
+          }
+        });
+      });
+    }
+
+    // App Launcher trigger
+    const launcherTriggers = menu!.querySelectorAll(".menu-item-launcher");
+    launcherTriggers.forEach((trigger) => {
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        // Close menu
+        if (closeTimeout) clearTimeout(closeTimeout);
+        isOpen = false;
+        menu!.classList.remove("visible-menu");
+        menu!.classList.add("hidden-menu");
+        toggle!.setAttribute("aria-expanded", "false");
+        // Fire app launcher event
+        window.dispatchEvent(new CustomEvent("app-launcher:open"));
+      });
+    });
+  })();
+</script>

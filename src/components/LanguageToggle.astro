@@ -1,0 +1,70 @@
+---
+import { translations } from "../data/i18n";
+const t = translations.de;
+---
+
+<button
+  id="langToggle"
+  class="header-lang-btn"
+  aria-label={t.langToggleLabel}
+  data-i18n-aria="langToggleLabel"
+  type="button"
+>
+  <span id="langLabel">DE</span>
+</button>
+
+<script is:inline define:vars={{ translationsJson: JSON.stringify(translations) }}>
+  (function() {
+    const translations = JSON.parse(translationsJson);
+    const btn = document.getElementById("langToggle");
+    const label = document.getElementById("langLabel");
+    if (!btn || !label) return;
+
+    let currentLang = localStorage.getItem("lang") || "de";
+    if (currentLang !== "de" && currentLang !== "en") currentLang = "de";
+    applyLang(currentLang);
+
+    btn.addEventListener("click", function() {
+      currentLang = currentLang === "de" ? "en" : "de";
+      localStorage.setItem("lang", currentLang);
+      applyLang(currentLang);
+    });
+
+    function applyLang(lang) {
+      label.textContent = lang.toUpperCase();
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        const key = el.getAttribute("data-i18n");
+        if (translations[lang] && translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+
+      document.querySelectorAll("[data-i18n-aria]").forEach(function(el) {
+        const key = el.getAttribute("data-i18n-aria");
+        if (translations[lang] && translations[lang][key]) {
+          el.setAttribute("aria-label", translations[lang][key]);
+        }
+      });
+
+      document.querySelectorAll(".menu-item[data-label-de]").forEach(function(el) {
+        const text = el.querySelector(".menu-text");
+        if (text) {
+          text.textContent = lang === "de"
+            ? el.getAttribute("data-label-de") || ""
+            : el.getAttribute("data-label-en") || "";
+        }
+      });
+
+      document.querySelectorAll(".category-card[data-name-de]").forEach(function(el) {
+        const labelEl = el.querySelector(".category-label");
+        if (labelEl) {
+          labelEl.textContent = lang === "de"
+            ? el.getAttribute("data-name-de") || ""
+            : el.getAttribute("data-name-en") || "";
+        }
+      });
+    }
+  })();
+</script>

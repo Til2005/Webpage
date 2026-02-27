@@ -1,0 +1,56 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = "TXFE" } = Astro.props;
+---
+
+<header class="txfe-header flex items-center justify-between px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-bg)]">
+  <!-- Back button -->
+  <a
+    href="/"
+    class="txfe-back flex items-center gap-2 px-3 py-2 -ml-3 rounded-full hover:bg-[var(--color-fg)]/10 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-fg)] focus-visible:outline-offset-2"
+    data-label-de="Zurück"
+    data-label-en="Back"
+    aria-label="Zurück"
+  >
+    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+    <span class="text-sm font-medium hidden sm:inline">Zurück</span>
+  </a>
+
+  <!-- Title -->
+  <h1 class="text-lg font-bold">{title}</h1>
+
+  <!-- Actions -->
+  <div class="flex items-center gap-2">
+    <button
+      id="txfeClear"
+      class="txfe-action-btn px-3 py-2 text-sm font-medium rounded-full border-2 border-[var(--color-fg)] hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-fg)] focus-visible:outline-offset-2"
+      data-label-de="Leeren"
+      data-label-en="Clear"
+      aria-label="Alle Bilder entfernen"
+      disabled
+    >
+      Leeren
+    </button>
+    <button
+      id="txfeExport"
+      class="txfe-action-btn px-3 py-2 text-sm font-medium rounded-full bg-[var(--color-fg)] text-[var(--color-bg)] hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-bg)] focus-visible:outline-offset-2"
+      data-label-de="Exportieren"
+      data-label-en="Export"
+      aria-label="Bilder exportieren"
+      disabled
+    >
+      Exportieren
+    </button>
+  </div>
+</header>
+
+<style>
+  .txfe-header {
+    min-height: 3.5rem;
+  }
+</style>

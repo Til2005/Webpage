@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Notebook -->
+  <rect x="12" y="8" width="36" height="46" rx="3" />
+  <!-- Spine binding -->
+  <line x1="20" y1="8" x2="20" y2="54" />
+  <!-- Text lines -->
+  <line x1="26" y1="20" x2="42" y2="20" />
+  <line x1="26" y1="28" x2="42" y2="28" />
+  <line x1="26" y1="36" x2="36" y2="36" />
+  <!-- Pen -->
+  <line x1="44" y1="46" x2="54" y2="36" />
+  <path d="M54 36 l4 4 -10 10 -4 -4z" />
+  <line x1="50" y1="56" x2="54" y2="56" />
+</svg>

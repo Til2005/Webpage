@@ -1,0 +1,65 @@
+---
+import TXFESlider from "./TXFESlider.astro";
+import TXFEColorPicker from "./TXFEColorPicker.astro";
+---
+
+<div id="txfePanel-design" class="txfe-panel p-6 hidden" role="tabpanel" aria-labelledby="txfeTab-design">
+  <div class="max-w-4xl mx-auto space-y-6">
+    <!-- Text Input -->
+    <div>
+      <label for="txfeTextInput" class="block text-sm font-medium mb-2" data-label-de="Text" data-label-en="Text">
+        Text
+      </label>
+      <textarea
+        id="txfeTextInput"
+        class="w-full px-4 py-3 rounded-lg border-2 border-[var(--color-border)] bg-transparent focus:border-[var(--color-fg)] focus:outline-none transition-colors resize-none"
+        rows="2"
+        placeholder="Text eingeben..."
+        data-placeholder-de="Text eingeben..."
+        data-placeholder-en="Enter text..."
+      ></textarea>
+    </div>
+
+    <!-- Color Picker -->
+    <TXFEColorPicker />
+
+    <!-- Size -->
+    <TXFESlider
+      id="design-size"
+      label="Größe"
+      labelEn="Size"
+      min={10}
+      max={150}
+      value={32}
+    />
+
+    <!-- Position Info -->
+    <div class="text-sm text-[var(--color-muted)] p-4 bg-[var(--color-fg)]/5 rounded-lg">
+      <p data-i18n-de="Halte den Text im Bild gedrückt und verschiebe ihn an die gewünschte Position." data-i18n-en="Hold and drag the text on the image to position it.">
+        Halte den Text im Bild gedrückt und verschiebe ihn an die gewünschte Position.
+      </p>
+    </div>
+
+    <!-- Position Sliders -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <TXFESlider
+        id="design-x"
+        label="Horizontal"
+        labelEn="Horizontal"
+        min={0}
+        max={100}
+        value={50}
+        unit="%"
+      />
+      <TXFESlider
+        id="design-y"
+        label="Vertikal"
+        labelEn="Vertical"
+        min={0}
+        max={100}
+        value={50}
+        unit="%"
+      />
+    </div>
+  </div>
+</div>

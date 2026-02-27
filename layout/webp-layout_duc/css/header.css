@@ -1,0 +1,33 @@
+/* Custom styles not handled by Tailwind, placed in css/header.css */
+
+/* Base body styling (from the original <style> block) */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f4f8;
+    padding-top: 64px; /* Space for the header */
+}
+
+/* Define the class that moves the header off-screen (used by JS) */
+.header-hidden {
+    top: -64px; /* Must match the header height (h-16 or 64px) for a clean hide */
+}
+
+/* Use a custom class to control the dropdown appearance via JS */
+.dropdown-menu {
+    transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+    transform-origin: top right;
+}
+
+/* The hidden state for the dropdown (default state) */
+.dropdown-menu.hidden {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none; /* Prevents clicking when hidden */
+}
+
+/* The visible state for the dropdown (added by JS) */
+.dropdown-menu.visible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}

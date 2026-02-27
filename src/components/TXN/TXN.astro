@@ -1,0 +1,26 @@
+---
+import TXNSidebar from "./TXNSidebar.astro";
+import TXNEditor from "./TXNEditor.astro";
+---
+
+<div class="txn-app" role="application" aria-label="TXN Notes">
+  <TXNSidebar />
+  <TXNEditor />
+</div>
+
+<!-- Toast notifications -->
+<div id="txnNotifications" class="txn-notifications" aria-live="polite" aria-atomic="false"></div>
+
+<script>
+  import { initTXN } from "../../scripts/txn/main";
+  initTXN();
+</script>
+
+<style>
+  .txn-app {
+    display: flex;
+    height: calc(100vh - var(--header-height));
+    overflow: hidden;
+    background-color: var(--color-bg);
+  }
+</style>

@@ -1,0 +1,101 @@
+---
+import TXFESlider from "./TXFESlider.astro";
+---
+
+<div id="txfePanel-filter" class="txfe-panel" role="tabpanel" aria-labelledby="txfeTab-filter">
+  <div class="flex flex-col gap-2">
+    <TXFESlider
+      id="filter-saturation"
+      label="Sättigung"
+      labelEn="Saturation"
+      min={0}
+      max={200}
+      value={100}
+      unit="%"
+    />
+    <TXFESlider
+      id="filter-brightness"
+      label="Helligkeit"
+      labelEn="Brightness"
+      min={0}
+      max={200}
+      value={100}
+      unit="%"
+    />
+    <TXFESlider
+      id="filter-contrast"
+      label="Kontrast"
+      labelEn="Contrast"
+      min={0}
+      max={200}
+      value={100}
+      unit="%"
+    />
+    <TXFESlider
+      id="filter-warmth"
+      label="Wärme"
+      labelEn="Warmth"
+      min={-100}
+      max={100}
+      value={0}
+    />
+    <TXFESlider
+      id="filter-hue"
+      label="Farbton"
+      labelEn="Hue"
+      min={-180}
+      max={180}
+      value={0}
+      unit="°"
+    />
+    <TXFESlider
+      id="filter-sharpness"
+      label="Schärfe"
+      labelEn="Sharpness"
+      min={-100}
+      max={100}
+      value={0}
+    />
+
+    <div class="flex flex-col gap-3 pt-6">
+      <!-- Apply to all (visible only with 2+ images) -->
+      <button
+        id="txfeApplyToAll"
+        class="txfe-action-btn self-start"
+        style="display:none"
+        data-i18n="txfeApplyToAll"
+        disabled
+      >
+        Auf alle anwenden
+      </button>
+
+      <!-- Actions -->
+      <div class="flex gap-3">
+        <button
+          id="txfeClear"
+          class="txfe-action-btn flex-1"
+          data-i18n="txfeClear"
+          disabled
+        >
+          Leeren
+        </button>
+        <button
+          id="txfeTxcUpload"
+          class="txfe-action-btn-primary flex-1"
+          data-i18n="txfeTxcUpload"
+          disabled
+        >
+          In TXC hochladen
+        </button>
+        <button
+          id="txfeExport"
+          class="txfe-action-btn-primary flex-1"
+          data-i18n="txfeExport"
+          disabled
+        >
+          Exportieren
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

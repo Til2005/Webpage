@@ -1,0 +1,93 @@
+---
+
+---
+
+<div class="txfe-queue flex gap-3 overflow-x-auto">
+  <!-- Queue items will be added dynamically -->
+  <div id="txfeQueueList" class="flex gap-3">
+    <!-- Thumbnails inserted here -->
+  </div>
+
+  <!-- Add button -->
+  <button
+    id="txfeAddMore"
+    class="txfe-add-btn"
+    aria-label="Bilder hinzufügen"
+  >
+    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  </button>
+</div>
+
+<style>
+  .txfe-queue {
+    scrollbar-width: none;
+  }
+  .txfe-queue::-webkit-scrollbar {
+    display: none;
+  }
+
+  .txfe-add-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    background-color: color-mix(in srgb, var(--color-fg) 8%, transparent);
+    color: var(--color-muted);
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .txfe-add-btn:hover {
+    background-color: color-mix(in srgb, var(--color-fg) 15%, transparent);
+    color: var(--color-fg);
+  }
+
+  .txfe-queue-item {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .txfe-queue-item:hover {
+    transform: scale(1.05);
+  }
+
+  .txfe-queue-item.active {
+    box-shadow: 0 0 0 3px var(--color-fg);
+  }
+
+  .txfe-queue-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .txfe-queue-item-remove {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-fg);
+    color: var(--color-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .txfe-queue-item:hover .txfe-queue-item-remove {
+    opacity: 1;
+  }
+</style>
