@@ -134,22 +134,34 @@ import AppLayout from "../../layouts/AppLayout.astro";
     }
   }
 
-  // PKCE: Exchange code from URL before checking session
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get('code');
-  if (code) {
-    supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+  // Handle OAuth callback (PKCE code exchange or hash tokens)
+  async function handleAuthCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    const code = params.get('code');
+
+    if (code) {
+      // PKCE flow
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
       if (!error && data.session) {
-        // Clean URL
         window.history.replaceState({}, '', window.location.pathname);
-        renderUser(data.session.user);
-      } else {
-        getUser().then(user => renderUser(user));
+        return data.session.user;
       }
-    });
-  } else {
-    getUser().then(user => renderUser(user));
+      console.error('Code exchange failed:', error?.message);
+    } else if (hash && hash.includes('access_token')) {
+      // Implicit flow fallback — parse tokens from hash
+      const { data, error } = await supabase.auth.getSession();
+      if (!error && data.session) {
+        window.history.replaceState({}, '', window.location.pathname);
+        return data.session.user;
+      }
+    }
+    // No callback params — check existing session
+    const { data: { user } } = await supabase.auth.getUser();
+    return user;
   }
+
+  handleAuthCallback().then(user => renderUser(user));
 
   supabase.auth.onAuthStateChange((_event, session) => {
     renderUser(session?.user ?? null);
