@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(npm create astro@latest:*)",
+      "Bash(xcopy:*)",
+      "Bash(robocopy:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(npx astro add:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout:*)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\TILSAND\\\\Desktop\\\\Webpage\\\\public\\\\icons\")",
+      "Bash(dir:*)",
+      "Bash(taskkill:*)",
+      "Bash(ls \"C:\\\\Users\\\\TILSAND\\\\Desktop\\\\Webpage\\\\public\\\\animations\\\\txp\\\\jump\"\" | tail -5 && ls \"C:UsersTILSANDDesktopWebpagepublicanimationstxpjump\"\")",
+      "Bash(head:*)",
+      "Bash(cd \"C:\\\\Users\\\\TILSAND\\\\Desktop\\\\Webpage\" && node --input-type=module -e \"\nimport { readFileSync } from 'fs';\nconst files = [\n  'src/scripts/txn/stateManager.ts',\n  'src/scripts/txn/storageManager.ts',\n  'src/scripts/txn/searchManager.ts',\n  'src/scripts/txn/exportManager.ts',\n  'src/scripts/txn/importManager.ts',\n  'src/scripts/txn/main.ts',\n];\nfiles.forEach\\(f => {\n  try { readFileSync\\(f, 'utf8'\\); console.log\\('OK:', f\\); }\n  catch\\(e\\) { console.error\\('MISSING:', f\\); }\n}\\);\n\" 2>&1)",
+      "Bash(ls:*)",
+      "WebSearch",
+      "WebFetch(domain:chromestatus.com)",
+      "WebFetch(domain:bundlephobia.com)",
+      "WebFetch(domain:firebase.google.com)",
+      "WebFetch(domain:supabase.com)",
+      "Bash(git remote:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:community.cloudflare.com)",
+      "Bash(git:*)"
+    ]
+  }
+}
