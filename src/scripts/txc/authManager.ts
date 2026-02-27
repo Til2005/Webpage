@@ -5,7 +5,7 @@ export async function signInWithGoogle() {
   await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/app/txc`,
+      redirectTo: `${window.location.origin}/app/txc/`,
     },
   });
 }
