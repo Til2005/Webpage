@@ -374,6 +374,23 @@ function showFolderContextMenu(e: MouseEvent, folderId: string) {
   ]);
 }
 
+function showSidebarContextMenu(e: MouseEvent) {
+  e.preventDefault();
+  createMenu(e.clientX, e.clientY, [
+    {
+      label: 'Neue Notiz',
+      action: () => { createNote(null); persistAll(); closeSidebarOnMobile(); },
+    },
+    {
+      label: 'Neuer Ordner',
+      action: () => {
+        const name = prompt('Ordnername:');
+        if (name?.trim()) { createFolder(name.trim()); persistAll(); }
+      },
+    },
+  ]);
+}
+
 // ── Sidebar render ────────────────────────────────────────────────────────────
 
 function renderSidebar() {
@@ -878,6 +895,9 @@ function initEditor() {
     scheduleAutoSave();
   });
 
+  // Use <p> as default paragraph separator (Enter = new paragraph, Shift+Enter = <br>)
+  document.execCommand('defaultParagraphSeparator', false, 'p');
+
   // Ctrl+Click opens links
   editorEl.addEventListener('click', (e) => {
     if (!e.ctrlKey && !e.metaKey) return;
@@ -889,15 +909,6 @@ function initEditor() {
       tmp.target = '_blank';
       tmp.rel = 'noopener noreferrer';
       tmp.click();
-    }
-  });
-
-  // Consistent Enter: insert paragraph
-  editorEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      const node = window.getSelection()?.getRangeAt(0)?.startContainer;
-      const inList = (node as Node)?.parentElement?.closest('li, ul, ol');
-      if (!inList) { e.preventDefault(); document.execCommand('insertParagraph'); }
     }
   });
 
@@ -1564,6 +1575,11 @@ function initSidebarButtons() {
     createNote(null);
     persistAll();
   });
+
+  $('txnFileTree')?.addEventListener('contextmenu', (e) => {
+    if ((e.target as Element).closest('.txn-note-item, .txn-folder-header')) return;
+    showSidebarContextMenu(e as MouseEvent);
+  });
 }
 
 // ── Selection bar ─────────────────────────────────────────────────────────────
@@ -1646,19 +1662,6 @@ function onStateChange() {
 export function initTXN() {
   // Load persisted data into state
   initState({ notes: loadNotes(), folders: loadFolders() });
-
-  // Async cloud sync: load from cloud and merge with local data
-  loadFromCloud().then(async cloudData => {
-    if (!cloudData) return;
-    const local = { notes: getState().notes, folders: getState().folders };
-    const merged = mergeData(local, cloudData);
-    loadCloudData(merged.notes, merged.folders);
-    saveNotes(merged.notes);
-    saveFolders(merged.folders);
-    await loadTXNMediaFromCloud(merged.notes);
-    if (editorEl) editorEl.dataset.noteId = '';
-    onStateChange();
-  }).catch(() => {});
 
   // Get DOM refs
   editorEl = $<HTMLDivElement>('txnContent');
