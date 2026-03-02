@@ -46,4 +46,13 @@ export const apps: App[] = [
     icon: '/icons/apps/txme.svg',
     href: '/app/txme',
   },
+  {
+    id: 'txcv',
+    name: 'TXCV',
+    nameEn: 'TXCV',
+    description: 'Konverter',
+    descriptionEn: 'Converter',
+    icon: '/icons/apps/txcv.svg',
+    href: '/app/txcv',
+  },
 ];

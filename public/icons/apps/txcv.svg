@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Left document -->
+  <path d="M8 14 L8 50 Q8 52 10 52 L30 52 Q32 52 32 50 L32 24 L20 14 Z" />
+  <polyline points="20,14 20,24 32,24" />
+  <!-- Right document (offset) -->
+  <path d="M36 22 L36 58 Q36 60 38 60 L58 60 Q60 60 60 58 L60 32 L48 22 Z" opacity="0.5" />
+  <polyline points="48,22 48,32 60,32" opacity="0.5" />
+  <!-- Conversion arrow -->
+  <line x1="12" y1="35" x2="28" y2="35" />
+  <polyline points="22,30 28,35 22,40" />
+  <line x1="52" y1="43" x2="36" y2="43" />
+  <polyline points="42,38 36,43 42,48" />
+</svg>

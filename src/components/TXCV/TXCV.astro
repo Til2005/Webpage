@@ -1,0 +1,1361 @@
+---
+---
+
+<div class="txcv-wrap">
+
+  <!-- ── Tab bar ───────────────────────────────────────────────────────── -->
+  <div class="txcv-tabs" role="tablist" aria-label="Konverter-Kategorien">
+    <button class="txcv-tab active" data-tab="images" role="tab" aria-selected="true" aria-controls="panel-images">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+      Bilder
+    </button>
+    <button class="txcv-tab" data-tab="data" role="tab" aria-selected="false" aria-controls="panel-data">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg>
+      Daten
+    </button>
+  </div>
+
+  <!-- ── IMAGE PANEL ───────────────────────────────────────────────────── -->
+  <div class="txcv-panel" id="panel-images" role="tabpanel" aria-labelledby="">
+
+    <!-- Drop zone -->
+    <div class="txcv-drop" id="txcvDrop" tabindex="0" role="button" aria-label="Dateien hierher ziehen oder klicken zum Auswählen">
+      <input type="file" id="txcvInput" multiple accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/svg+xml,image/x-icon,image/vnd.microsoft.icon,image/avif" class="txcv-input" aria-hidden="true" />
+      <div class="txcv-drop-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/>
+          <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+        </svg>
+      </div>
+      <p class="txcv-drop-title">Bilder hierher ziehen</p>
+      <p class="txcv-drop-sub">oder <span class="txcv-drop-link">Dateien auswählen</span></p>
+      <p class="txcv-drop-formats">JPEG · PNG · WebP · GIF · BMP · SVG · ICO · AVIF</p>
+    </div>
+
+    <!-- Queue -->
+    <div class="txcv-queue hidden" id="txcvQueue" aria-label="Dateiliste"></div>
+
+    <!-- Action bar -->
+    <div class="txcv-action-bar hidden" id="txcvActionBar">
+      <div class="txcv-action-left">
+        <label class="txcv-global-label" for="txcvGlobalFormat">Alle konvertieren zu:</label>
+        <select id="txcvGlobalFormat" class="txcv-select">
+          <option value="">— individuell —</option>
+          <option value="image/png">PNG</option>
+          <option value="image/jpeg">JPEG</option>
+          <option value="image/webp">WebP</option>
+          <option value="image/bmp">BMP</option>
+          <option value="image/x-icon">ICO</option>
+        </select>
+      </div>
+      <div class="txcv-action-right">
+        <button class="txcv-btn txcv-btn-ghost" id="txcvAddMoreBtn" type="button">+ Weitere</button>
+        <button class="txcv-btn txcv-btn-ghost" id="txcvClearBtn" type="button">Leeren</button>
+        <button class="txcv-btn txcv-btn-primary" id="txcvConvertBtn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Konvertieren
+        </button>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="txcv-results hidden" id="txcvResults">
+      <div class="txcv-results-header">
+        <h2 class="txcv-results-title">Ergebnisse</h2>
+        <div class="txcv-results-actions">
+          <button class="txcv-btn txcv-btn-ghost" id="txcvDownloadAllBtn" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Alle herunterladen
+          </button>
+          <button class="txcv-btn txcv-btn-ghost" id="txcvNewConversionBtn" type="button">Neue Konvertierung</button>
+        </div>
+      </div>
+      <div class="txcv-results-grid" id="txcvResultsGrid"></div>
+    </div>
+  </div>
+
+  <!-- ── DATA PANEL ────────────────────────────────────────────────────── -->
+  <div class="txcv-panel hidden" id="panel-data" role="tabpanel">
+    <div class="txcv-data-grid">
+
+      <!-- JSON Formatter -->
+      <div class="txcv-tool-card">
+        <div class="txcv-tool-head">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg>
+          <span>JSON Formatierer</span>
+        </div>
+        <textarea class="txcv-textarea" id="jsonInput" placeholder='{"key": "value", "num": 42}' spellcheck="false" aria-label="JSON Eingabe"></textarea>
+        <div class="txcv-tool-btns">
+          <button class="txcv-btn txcv-btn-sm" id="jsonFormatBtn">Pretty Print</button>
+          <button class="txcv-btn txcv-btn-sm" id="jsonMinifyBtn">Minify</button>
+          <button class="txcv-btn txcv-btn-sm txcv-btn-ghost" id="jsonCopyBtn">Kopieren</button>
+        </div>
+        <textarea class="txcv-textarea txcv-textarea-out" id="jsonOutput" readonly placeholder="Ergebnis…" spellcheck="false" aria-label="JSON Ausgabe" aria-live="polite"></textarea>
+      </div>
+
+      <!-- CSV ↔ JSON -->
+      <div class="txcv-tool-card">
+        <div class="txcv-tool-head">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <span>CSV ↔ JSON</span>
+        </div>
+        <textarea class="txcv-textarea" id="csvInput" placeholder="name,age,city&#10;Alice,30,Berlin&#10;Bob,25,Hamburg" spellcheck="false" aria-label="CSV oder JSON Eingabe"></textarea>
+        <div class="txcv-tool-btns">
+          <button class="txcv-btn txcv-btn-sm" id="csvToJsonBtn">CSV → JSON</button>
+          <button class="txcv-btn txcv-btn-sm" id="jsonToCsvBtn">JSON → CSV</button>
+          <button class="txcv-btn txcv-btn-sm txcv-btn-ghost" id="csvCopyBtn">Kopieren</button>
+        </div>
+        <textarea class="txcv-textarea txcv-textarea-out" id="csvOutput" readonly placeholder="Ergebnis…" spellcheck="false" aria-label="Ausgabe" aria-live="polite"></textarea>
+      </div>
+
+      <!-- Base64 -->
+      <div class="txcv-tool-card">
+        <div class="txcv-tool-head">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <span>Base64</span>
+        </div>
+        <div class="txcv-b64-file-row">
+          <label class="txcv-btn txcv-btn-sm txcv-btn-ghost" for="b64FileInput">Datei wählen</label>
+          <input type="file" id="b64FileInput" class="txcv-input" aria-label="Datei für Base64 Kodierung" />
+          <span class="txcv-b64-filename" id="b64FileName">oder Text eingeben</span>
+        </div>
+        <textarea class="txcv-textarea" id="b64Input" placeholder="Text oder Base64 eingeben…" spellcheck="false" aria-label="Base64 Eingabe"></textarea>
+        <div class="txcv-tool-btns">
+          <button class="txcv-btn txcv-btn-sm" id="b64EncodeBtn">Kodieren</button>
+          <button class="txcv-btn txcv-btn-sm" id="b64DecodeBtn">Dekodieren</button>
+          <button class="txcv-btn txcv-btn-sm txcv-btn-ghost" id="b64CopyBtn">Kopieren</button>
+        </div>
+        <textarea class="txcv-textarea txcv-textarea-out" id="b64Output" readonly placeholder="Ergebnis…" spellcheck="false" aria-label="Base64 Ausgabe" aria-live="polite"></textarea>
+      </div>
+
+      <!-- URL Encoder -->
+      <div class="txcv-tool-card">
+        <div class="txcv-tool-head">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span>URL Kodierung</span>
+        </div>
+        <textarea class="txcv-textarea" id="urlInput" placeholder="https://example.com/pfad?name=Müller&stadt=Köln" spellcheck="false" aria-label="URL Eingabe"></textarea>
+        <div class="txcv-tool-btns">
+          <button class="txcv-btn txcv-btn-sm" id="urlEncodeBtn">Kodieren</button>
+          <button class="txcv-btn txcv-btn-sm" id="urlDecodeBtn">Dekodieren</button>
+          <button class="txcv-btn txcv-btn-sm txcv-btn-ghost" id="urlCopyBtn">Kopieren</button>
+        </div>
+        <textarea class="txcv-textarea txcv-textarea-out" id="urlOutput" readonly placeholder="Ergebnis…" spellcheck="false" aria-label="URL Ausgabe" aria-live="polite"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="txcv-toast" id="txcvToast" role="status" aria-live="polite" aria-atomic="true"></div>
+</div>
+
+<!-- Hidden add-more input -->
+<input type="file" id="txcvAddMoreInput" multiple accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/svg+xml,image/x-icon,image/vnd.microsoft.icon,image/avif" class="txcv-input" aria-hidden="true" />
+
+<script>
+// ── Types ──────────────────────────────────────────────────────────────────
+interface QueueItem {
+  id: string;
+  file: File;
+  previewUrl: string;
+  targetFormat: string;
+  quality: number;
+}
+
+interface ResultItem {
+  id: string;
+  originalName: string;
+  blob: Blob;
+  url: string;
+  ext: string;
+  sizeBytes: number;
+}
+
+// ── State ──────────────────────────────────────────────────────────────────
+const queue = new Map<string, QueueItem>();
+const results: ResultItem[] = [];
+
+// ── Format helpers ─────────────────────────────────────────────────────────
+const MIME_TO_EXT: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/bmp': 'bmp',
+  'image/x-icon': 'ico',
+  'image/gif': 'gif',
+  'image/svg+xml': 'svg',
+  'image/avif': 'avif',
+};
+
+const EXT_TO_LABEL: Record<string, string> = {
+  'image/jpeg': 'JPEG',
+  'image/png': 'PNG',
+  'image/webp': 'WebP',
+  'image/bmp': 'BMP',
+  'image/x-icon': 'ICO',
+};
+
+function getDefaultTargetFormat(srcMime: string): string {
+  if (srcMime === 'image/png') return 'image/jpeg';
+  if (srcMime === 'image/jpeg') return 'image/png';
+  return 'image/png';
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+function stemName(filename: string): string {
+  return filename.replace(/\.[^/.]+$/, '');
+}
+
+function qualityFormats(): string[] {
+  return ['image/jpeg', 'image/webp'];
+}
+
+// ── BMP Encoder ────────────────────────────────────────────────────────────
+function encodeBMP(canvas: HTMLCanvasElement): Blob {
+  const ctx = canvas.getContext('2d')!;
+  const { width, height } = canvas;
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const { data } = imageData;
+
+  const rowPad = (4 - (width * 3) % 4) % 4;
+  const rowSize = width * 3 + rowPad;
+  const pixelDataSize = rowSize * height;
+  const fileSize = 54 + pixelDataSize;
+
+  const buf = new ArrayBuffer(fileSize);
+  const view = new DataView(buf);
+  const bytes = new Uint8Array(buf);
+
+  // File header
+  bytes[0] = 0x42; bytes[1] = 0x4D; // 'BM'
+  view.setUint32(2, fileSize, true);
+  view.setUint32(6, 0, true);
+  view.setUint32(10, 54, true); // pixel data offset
+
+  // DIB header (BITMAPINFOHEADER)
+  view.setUint32(14, 40, true);       // header size
+  view.setInt32(18, width, true);
+  view.setInt32(22, height, true);    // positive = bottom-up
+  view.setUint16(26, 1, true);        // color planes
+  view.setUint16(28, 24, true);       // bits per pixel
+  view.setUint32(30, 0, true);        // BI_RGB
+  view.setUint32(34, pixelDataSize, true);
+  view.setInt32(38, 2835, true);      // 72 DPI
+  view.setInt32(42, 2835, true);
+  view.setUint32(46, 0, true);
+  view.setUint32(50, 0, true);
+
+  // Pixel data — bottom-up, BGR
+  let offset = 54;
+  for (let y = height - 1; y >= 0; y--) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      bytes[offset++] = data[i + 2]; // B
+      bytes[offset++] = data[i + 1]; // G
+      bytes[offset++] = data[i];     // R
+    }
+    for (let p = 0; p < rowPad; p++) bytes[offset++] = 0;
+  }
+
+  return new Blob([buf], { type: 'image/bmp' });
+}
+
+// ── ICO Encoder (PNG-in-ICO) ───────────────────────────────────────────────
+async function encodeICO(canvas: HTMLCanvasElement): Promise<Blob> {
+  // Resize to max 256×256 for ICO
+  const size = Math.min(256, Math.max(canvas.width, canvas.height));
+  const scale = size / Math.max(canvas.width, canvas.height);
+  const w = Math.round(canvas.width * scale);
+  const h = Math.round(canvas.height * scale);
+
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d')!;
+  ctx.drawImage(canvas, 0, 0, w, h);
+
+  const pngBlob = await new Promise<Blob>(res => c.toBlob(b => res(b!), 'image/png'));
+  const pngData = new Uint8Array(await pngBlob.arrayBuffer());
+
+  const icoSize = 6 + 16 + pngData.byteLength;
+  const buf = new ArrayBuffer(icoSize);
+  const view = new DataView(buf);
+  const bytes = new Uint8Array(buf);
+
+  // ICO header
+  view.setUint16(0, 0, true); // reserved
+  view.setUint16(2, 1, true); // type: ICO
+  view.setUint16(4, 1, true); // count
+
+  // Directory entry
+  bytes[6] = w >= 256 ? 0 : w;
+  bytes[7] = h >= 256 ? 0 : h;
+  bytes[8] = 0; // color count
+  bytes[9] = 0; // reserved
+  view.setUint16(10, 1, true);  // color planes
+  view.setUint16(12, 32, true); // bpp
+  view.setUint32(14, pngData.byteLength, true); // data size
+  view.setUint32(18, 22, true); // offset: 6 + 16
+
+  bytes.set(pngData, 22);
+  return new Blob([buf], { type: 'image/x-icon' });
+}
+
+// ── Core conversion ────────────────────────────────────────────────────────
+async function convertImage(file: File, targetMime: string, quality: number): Promise<Blob> {
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    // SVG fallback via <img>
+    bitmap = await new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        createImageBitmap(img).then(resolve).catch(reject);
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Bild konnte nicht geladen werden')); };
+      img.src = url;
+    });
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  const ctx = canvas.getContext('2d')!;
+
+  if (targetMime === 'image/jpeg') {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  ctx.drawImage(bitmap, 0, 0);
+  bitmap.close();
+
+  if (targetMime === 'image/bmp') return encodeBMP(canvas);
+  if (targetMime === 'image/x-icon') return encodeICO(canvas);
+
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => blob ? resolve(blob) : reject(new Error('Konvertierung fehlgeschlagen')),
+      targetMime,
+      qualityFormats().includes(targetMime) ? quality : undefined
+    );
+  });
+}
+
+// ── DOM refs ───────────────────────────────────────────────────────────────
+const drop = document.getElementById('txcvDrop') as HTMLElement;
+const fileInput = document.getElementById('txcvInput') as HTMLInputElement;
+const addMoreInput = document.getElementById('txcvAddMoreInput') as HTMLInputElement;
+const queueEl = document.getElementById('txcvQueue') as HTMLElement;
+const actionBar = document.getElementById('txcvActionBar') as HTMLElement;
+const convertBtn = document.getElementById('txcvConvertBtn') as HTMLButtonElement;
+const clearBtn = document.getElementById('txcvClearBtn') as HTMLButtonElement;
+const addMoreBtn = document.getElementById('txcvAddMoreBtn') as HTMLButtonElement;
+const resultsEl = document.getElementById('txcvResults') as HTMLElement;
+const resultsGrid = document.getElementById('txcvResultsGrid') as HTMLElement;
+const downloadAllBtn = document.getElementById('txcvDownloadAllBtn') as HTMLButtonElement;
+const newConversionBtn = document.getElementById('txcvNewConversionBtn') as HTMLButtonElement;
+const globalFormatSel = document.getElementById('txcvGlobalFormat') as HTMLSelectElement;
+const toast = document.getElementById('txcvToast') as HTMLElement;
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+let toastTimer: ReturnType<typeof setTimeout>;
+function showToast(msg: string, type: 'ok' | 'err' = 'ok') {
+  toast.textContent = msg;
+  toast.className = `txcv-toast txcv-toast--${type} txcv-toast--show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('txcv-toast--show'), 3500);
+}
+
+// ── Queue UI ───────────────────────────────────────────────────────────────
+function addFiles(files: FileList | File[]) {
+  const arr = Array.from(files);
+  for (const file of arr) {
+    if (!file.type.startsWith('image/')) continue;
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const previewUrl = URL.createObjectURL(file);
+    const item: QueueItem = {
+      id,
+      file,
+      previewUrl,
+      targetFormat: getDefaultTargetFormat(file.type),
+      quality: 0.85,
+    };
+    queue.set(id, item);
+    renderQueueItem(item);
+  }
+  syncQueueVisibility();
+}
+
+function renderQueueItem(item: QueueItem) {
+  drop.classList.add('txcv-drop--compact');
+
+  const row = document.createElement('div');
+  row.className = 'txcv-queue-item';
+  row.dataset.id = item.id;
+
+  const srcExt = (MIME_TO_EXT[item.file.type] || item.file.type.split('/')[1] || '?').toUpperCase();
+
+  row.innerHTML = `
+    <img class="txcv-qi-thumb" src="${item.previewUrl}" alt="" loading="lazy" />
+    <div class="txcv-qi-info">
+      <span class="txcv-qi-name">${item.file.name}</span>
+      <span class="txcv-qi-meta">${srcExt} · ${formatBytes(item.file.size)}</span>
+    </div>
+    <div class="txcv-qi-controls">
+      <div class="txcv-qi-arrow" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+      </div>
+      <select class="txcv-select txcv-qi-format" aria-label="Zielformat">
+        <option value="image/png" ${item.targetFormat === 'image/png' ? 'selected' : ''}>PNG</option>
+        <option value="image/jpeg" ${item.targetFormat === 'image/jpeg' ? 'selected' : ''}>JPEG</option>
+        <option value="image/webp" ${item.targetFormat === 'image/webp' ? 'selected' : ''}>WebP</option>
+        <option value="image/bmp" ${item.targetFormat === 'image/bmp' ? 'selected' : ''}>BMP</option>
+        <option value="image/x-icon" ${item.targetFormat === 'image/x-icon' ? 'selected' : ''}>ICO</option>
+      </select>
+      <div class="txcv-qi-quality-wrap" data-visible="${qualityFormats().includes(item.targetFormat)}">
+        <input type="range" class="txcv-qi-quality" min="0.1" max="1" step="0.05" value="${item.quality}" aria-label="Qualität" />
+        <span class="txcv-qi-quality-val">${Math.round(item.quality * 100)}%</span>
+      </div>
+    </div>
+    <button class="txcv-qi-remove" aria-label="${item.file.name} entfernen" type="button">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>`;
+
+  const formatSel = row.querySelector('.txcv-qi-format') as HTMLSelectElement;
+  const qualityRange = row.querySelector('.txcv-qi-quality') as HTMLInputElement;
+  const qualityVal = row.querySelector('.txcv-qi-quality-val') as HTMLSpanElement;
+  const qualityWrap = row.querySelector('.txcv-qi-quality-wrap') as HTMLElement;
+  const removeBtn = row.querySelector('.txcv-qi-remove') as HTMLButtonElement;
+
+  formatSel.addEventListener('change', () => {
+    item.targetFormat = formatSel.value;
+    const hasQuality = qualityFormats().includes(item.targetFormat);
+    qualityWrap.dataset.visible = String(hasQuality);
+    // Apply global format reset if needed
+  });
+
+  qualityRange.addEventListener('input', () => {
+    item.quality = parseFloat(qualityRange.value);
+    qualityVal.textContent = Math.round(item.quality * 100) + '%';
+  });
+
+  removeBtn.addEventListener('click', () => {
+    URL.revokeObjectURL(item.previewUrl);
+    queue.delete(item.id);
+    row.remove();
+    syncQueueVisibility();
+  });
+
+  queueEl.appendChild(row);
+}
+
+function syncQueueVisibility() {
+  const hasItems = queue.size > 0;
+  queueEl.classList.toggle('hidden', !hasItems);
+  actionBar.classList.toggle('hidden', !hasItems);
+  if (!hasItems) drop.classList.remove('txcv-drop--compact');
+}
+
+// ── Global format selector ─────────────────────────────────────────────────
+globalFormatSel.addEventListener('change', () => {
+  const fmt = globalFormatSel.value;
+  if (!fmt) return;
+  queueEl.querySelectorAll('.txcv-qi-format').forEach((sel) => {
+    const s = sel as HTMLSelectElement;
+    s.value = fmt;
+    const item = queue.get((s.closest('.txcv-queue-item') as HTMLElement).dataset.id!);
+    if (item) {
+      item.targetFormat = fmt;
+      const qWrap = s.closest('.txcv-queue-item')!.querySelector('.txcv-qi-quality-wrap') as HTMLElement;
+      qWrap.dataset.visible = String(qualityFormats().includes(fmt));
+    }
+  });
+});
+
+// ── Convert ────────────────────────────────────────────────────────────────
+convertBtn.addEventListener('click', async () => {
+  if (queue.size === 0) return;
+
+  convertBtn.disabled = true;
+  convertBtn.textContent = 'Konvertiere…';
+  results.length = 0;
+  resultsGrid.innerHTML = '';
+
+  const items = Array.from(queue.values());
+  let done = 0;
+
+  for (const item of items) {
+    const row = queueEl.querySelector(`.txcv-queue-item[data-id="${item.id}"]`) as HTMLElement;
+    row?.classList.add('txcv-qi--converting');
+
+    try {
+      const blob = await convertImage(item.file, item.targetFormat, item.quality);
+      const ext = MIME_TO_EXT[item.targetFormat] || 'bin';
+      const url = URL.createObjectURL(blob);
+      const result: ResultItem = {
+        id: item.id,
+        originalName: item.file.name,
+        blob,
+        url,
+        ext,
+        sizeBytes: blob.size,
+      };
+      results.push(result);
+      renderResultItem(result, item);
+      row?.classList.remove('txcv-qi--converting');
+      row?.classList.add('txcv-qi--done');
+    } catch (err) {
+      row?.classList.remove('txcv-qi--converting');
+      row?.classList.add('txcv-qi--error');
+      console.error('Conversion error:', err);
+    }
+    done++;
+    convertBtn.textContent = `Konvertiere… ${done}/${items.length}`;
+  }
+
+  convertBtn.disabled = false;
+  convertBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Konvertieren`;
+
+  if (results.length > 0) {
+    resultsEl.classList.remove('hidden');
+    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+});
+
+// ── Result item rendering ──────────────────────────────────────────────────
+function renderResultItem(result: ResultItem, source: QueueItem) {
+  const card = document.createElement('div');
+  card.className = 'txcv-result-card';
+
+  const newName = `${stemName(result.originalName)}.${result.ext}`;
+  const label = EXT_TO_LABEL[source.targetFormat] || result.ext.toUpperCase();
+
+  card.innerHTML = `
+    <div class="txcv-rc-preview">
+      <img src="${result.url}" alt="${newName}" loading="lazy" />
+      <span class="txcv-rc-badge">${label}</span>
+    </div>
+    <div class="txcv-rc-info">
+      <span class="txcv-rc-name" title="${newName}">${newName}</span>
+      <span class="txcv-rc-size">${formatBytes(result.sizeBytes)}</span>
+    </div>
+    <div class="txcv-rc-actions">
+      <a class="txcv-btn txcv-btn-sm" href="${result.url}" download="${newName}" aria-label="${newName} herunterladen">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Laden
+      </a>
+      <button class="txcv-btn txcv-btn-sm txcv-btn-cloud" data-result-id="${result.id}" type="button" aria-label="In TXC speichern">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        TXC
+      </button>
+    </div>`;
+
+  const cloudBtn = card.querySelector('.txcv-btn-cloud') as HTMLButtonElement;
+  cloudBtn.addEventListener('click', () => uploadToTXC(result, newName, cloudBtn));
+
+  resultsGrid.appendChild(card);
+}
+
+// ── TXC Upload ─────────────────────────────────────────────────────────────
+async function uploadToTXC(result: ResultItem, filename: string, btn: HTMLButtonElement) {
+  btn.disabled = true;
+  btn.textContent = '…';
+
+  try {
+    const { saveImageBlobToCloud } = await import('../../scripts/txc/txnSync');
+    const ok = await saveImageBlobToCloud(result.blob, filename);
+    if (ok) {
+      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg> Gespeichert`;
+      btn.classList.add('txcv-btn-cloud--done');
+      showToast(`„${filename}" in TXC gespeichert`, 'ok');
+    } else {
+      throw new Error('Upload fehlgeschlagen');
+    }
+  } catch (err: unknown) {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> TXC`;
+    const msg = err instanceof Error ? err.message : 'Fehler';
+    showToast(msg.includes('50') || msg.includes('voll') ? 'TXC Speicher voll (50 MB)' : 'Nicht in TXC eingeloggt', 'err');
+  }
+}
+
+// ── Download all ───────────────────────────────────────────────────────────
+downloadAllBtn.addEventListener('click', async () => {
+  if (results.length === 1) {
+    const r = results[0];
+    const a = document.createElement('a');
+    a.href = r.url;
+    a.download = `${stemName(r.originalName)}.${r.ext}`;
+    a.click();
+    return;
+  }
+
+  // Multiple: download sequentially with small delay
+  for (const r of results) {
+    const a = document.createElement('a');
+    a.href = r.url;
+    a.download = `${stemName(r.originalName)}.${r.ext}`;
+    a.click();
+    await new Promise(res => setTimeout(res, 200));
+  }
+});
+
+// ── Clear / New conversion ─────────────────────────────────────────────────
+clearBtn.addEventListener('click', clearQueue);
+newConversionBtn.addEventListener('click', () => {
+  results.forEach(r => URL.revokeObjectURL(r.url));
+  results.length = 0;
+  resultsEl.classList.add('hidden');
+  resultsGrid.innerHTML = '';
+  clearQueue();
+});
+
+function clearQueue() {
+  queue.forEach(item => URL.revokeObjectURL(item.previewUrl));
+  queue.clear();
+  queueEl.innerHTML = '';
+  syncQueueVisibility();
+  fileInput.value = '';
+  addMoreInput.value = '';
+  globalFormatSel.value = '';
+}
+
+// ── Drop zone events ───────────────────────────────────────────────────────
+drop.addEventListener('click', (e) => {
+  if ((e.target as HTMLElement).closest('.txcv-qi-remove')) return;
+  fileInput.click();
+});
+drop.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+
+fileInput.addEventListener('change', () => { if (fileInput.files) addFiles(fileInput.files); fileInput.value = ''; });
+addMoreInput.addEventListener('change', () => { if (addMoreInput.files) addFiles(addMoreInput.files); addMoreInput.value = ''; });
+addMoreBtn.addEventListener('click', () => addMoreInput.click());
+
+drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('txcv-drop--hover'); });
+drop.addEventListener('dragleave', (e) => { if (!drop.contains(e.relatedTarget as Node)) drop.classList.remove('txcv-drop--hover'); });
+drop.addEventListener('drop', (e) => {
+  e.preventDefault();
+  drop.classList.remove('txcv-drop--hover');
+  if (e.dataTransfer?.files) addFiles(e.dataTransfer.files);
+});
+
+// ── Tab switching ──────────────────────────────────────────────────────────
+document.querySelectorAll('.txcv-tab').forEach((tab) => {
+  tab.addEventListener('click', () => {
+    const target = (tab as HTMLElement).dataset.tab;
+    document.querySelectorAll('.txcv-tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    tab.classList.add('active');
+    tab.setAttribute('aria-selected', 'true');
+    document.querySelectorAll('.txcv-panel').forEach(p => p.classList.add('hidden'));
+    document.getElementById(`panel-${target}`)?.classList.remove('hidden');
+  });
+});
+
+// ── DATA TOOLS ─────────────────────────────────────────────────────────────
+
+// JSON Formatter
+const jsonInput = document.getElementById('jsonInput') as HTMLTextAreaElement;
+const jsonOutput = document.getElementById('jsonOutput') as HTMLTextAreaElement;
+const jsonFormatBtn = document.getElementById('jsonFormatBtn') as HTMLButtonElement;
+const jsonMinifyBtn = document.getElementById('jsonMinifyBtn') as HTMLButtonElement;
+const jsonCopyBtn = document.getElementById('jsonCopyBtn') as HTMLButtonElement;
+
+jsonFormatBtn.addEventListener('click', () => {
+  try {
+    jsonOutput.value = JSON.stringify(JSON.parse(jsonInput.value), null, 2);
+    jsonOutput.classList.remove('txcv-textarea--error');
+  } catch {
+    jsonOutput.value = 'Ungültiges JSON';
+    jsonOutput.classList.add('txcv-textarea--error');
+  }
+});
+
+jsonMinifyBtn.addEventListener('click', () => {
+  try {
+    jsonOutput.value = JSON.stringify(JSON.parse(jsonInput.value));
+    jsonOutput.classList.remove('txcv-textarea--error');
+  } catch {
+    jsonOutput.value = 'Ungültiges JSON';
+    jsonOutput.classList.add('txcv-textarea--error');
+  }
+});
+
+jsonCopyBtn.addEventListener('click', () => { copyText(jsonOutput.value, jsonCopyBtn); });
+
+// CSV ↔ JSON
+const csvInput = document.getElementById('csvInput') as HTMLTextAreaElement;
+const csvOutput = document.getElementById('csvOutput') as HTMLTextAreaElement;
+const csvToJsonBtn = document.getElementById('csvToJsonBtn') as HTMLButtonElement;
+const jsonToCsvBtn = document.getElementById('jsonToCsvBtn') as HTMLButtonElement;
+const csvCopyBtn = document.getElementById('csvCopyBtn') as HTMLButtonElement;
+
+csvToJsonBtn.addEventListener('click', () => {
+  try {
+    const lines = csvInput.value.trim().split('\n');
+    const headers = parseCSVLine(lines[0]);
+    const rows = lines.slice(1).map(line => {
+      const vals = parseCSVLine(line);
+      const obj: Record<string, string> = {};
+      headers.forEach((h, i) => obj[h.trim()] = (vals[i] ?? '').trim());
+      return obj;
+    });
+    csvOutput.value = JSON.stringify(rows, null, 2);
+    csvOutput.classList.remove('txcv-textarea--error');
+  } catch {
+    csvOutput.value = 'Fehler beim Parsen';
+    csvOutput.classList.add('txcv-textarea--error');
+  }
+});
+
+jsonToCsvBtn.addEventListener('click', () => {
+  try {
+    const data = JSON.parse(csvInput.value);
+    if (!Array.isArray(data)) throw new Error('Erwartet ein Array');
+    const headers = Object.keys(data[0] ?? {});
+    const rows = [headers.join(','), ...data.map((row: Record<string, unknown>) =>
+      headers.map(h => csvEscape(String(row[h] ?? ''))).join(',')
+    )];
+    csvOutput.value = rows.join('\n');
+    csvOutput.classList.remove('txcv-textarea--error');
+  } catch {
+    csvOutput.value = 'Ungültiges JSON-Array';
+    csvOutput.classList.add('txcv-textarea--error');
+  }
+});
+
+csvCopyBtn.addEventListener('click', () => { copyText(csvOutput.value, csvCopyBtn); });
+
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+    else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
+    else cur += ch;
+  }
+  result.push(cur);
+  return result;
+}
+
+function csvEscape(v: string): string {
+  if (v.includes(',') || v.includes('"') || v.includes('\n')) return `"${v.replace(/"/g, '""')}"`;
+  return v;
+}
+
+// Base64
+const b64Input = document.getElementById('b64Input') as HTMLTextAreaElement;
+const b64Output = document.getElementById('b64Output') as HTMLTextAreaElement;
+const b64FileInput = document.getElementById('b64FileInput') as HTMLInputElement;
+const b64FileName = document.getElementById('b64FileName') as HTMLSpanElement;
+const b64EncodeBtn = document.getElementById('b64EncodeBtn') as HTMLButtonElement;
+const b64DecodeBtn = document.getElementById('b64DecodeBtn') as HTMLButtonElement;
+const b64CopyBtn = document.getElementById('b64CopyBtn') as HTMLButtonElement;
+
+b64FileInput.addEventListener('change', () => {
+  const file = b64FileInput.files?.[0];
+  if (!file) return;
+  b64FileName.textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const result = reader.result as string;
+    b64Output.value = result.split(',')[1] || result;
+    b64Output.classList.remove('txcv-textarea--error');
+  };
+  reader.readAsDataURL(file);
+  b64Input.value = '';
+});
+
+b64EncodeBtn.addEventListener('click', () => {
+  try {
+    b64Output.value = btoa(unescape(encodeURIComponent(b64Input.value)));
+    b64Output.classList.remove('txcv-textarea--error');
+  } catch {
+    b64Output.value = 'Enkodierungsfehler';
+    b64Output.classList.add('txcv-textarea--error');
+  }
+});
+
+b64DecodeBtn.addEventListener('click', () => {
+  try {
+    b64Output.value = decodeURIComponent(escape(atob(b64Input.value.trim())));
+    b64Output.classList.remove('txcv-textarea--error');
+  } catch {
+    b64Output.value = 'Ungültiger Base64-String';
+    b64Output.classList.add('txcv-textarea--error');
+  }
+});
+
+b64CopyBtn.addEventListener('click', () => { copyText(b64Output.value, b64CopyBtn); });
+
+// URL Encoder
+const urlInput = document.getElementById('urlInput') as HTMLTextAreaElement;
+const urlOutput = document.getElementById('urlOutput') as HTMLTextAreaElement;
+const urlEncodeBtn = document.getElementById('urlEncodeBtn') as HTMLButtonElement;
+const urlDecodeBtn = document.getElementById('urlDecodeBtn') as HTMLButtonElement;
+const urlCopyBtn = document.getElementById('urlCopyBtn') as HTMLButtonElement;
+
+urlEncodeBtn.addEventListener('click', () => { urlOutput.value = encodeURIComponent(urlInput.value); urlOutput.classList.remove('txcv-textarea--error'); });
+urlDecodeBtn.addEventListener('click', () => {
+  try {
+    urlOutput.value = decodeURIComponent(urlInput.value);
+    urlOutput.classList.remove('txcv-textarea--error');
+  } catch {
+    urlOutput.value = 'Ungültige URL-Kodierung';
+    urlOutput.classList.add('txcv-textarea--error');
+  }
+});
+urlCopyBtn.addEventListener('click', () => { copyText(urlOutput.value, urlCopyBtn); });
+
+// ── Copy helper ────────────────────────────────────────────────────────────
+function copyText(text: string, btn: HTMLButtonElement) {
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  });
+}
+</script>
+
+<style>
+  .txcv-wrap {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--header-height));
+    overflow: hidden;
+  }
+
+  /* ── Tabs ── */
+  .txcv-tabs {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.75rem 1.5rem 0;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+    background: var(--color-bg);
+  }
+
+  .txcv-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    border-radius: 0.25rem 0.25rem 0 0;
+  }
+
+  .txcv-tab:hover { color: var(--color-fg); }
+
+  .txcv-tab.active {
+    color: var(--color-fg);
+    border-bottom-color: var(--color-fg);
+  }
+
+  /* ── Panels ── */
+  .txcv-panel {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  .txcv-panel.hidden { display: none; }
+
+  /* ── Drop zone ── */
+  .txcv-drop {
+    margin: 1.5rem;
+    border: 1.5px dashed var(--color-border);
+    border-radius: 0.875rem;
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    outline-offset: 3px;
+  }
+
+  .txcv-drop:hover,
+  .txcv-drop:focus-visible {
+    border-color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-fg) 3%, transparent);
+  }
+
+  .txcv-drop--hover {
+    border-color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-fg) 5%, transparent);
+  }
+
+  .txcv-drop--compact {
+    padding: 1rem 1.5rem;
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .txcv-drop--compact .txcv-drop-icon { display: none; }
+  .txcv-drop--compact .txcv-drop-formats { display: none; }
+  .txcv-drop--compact .txcv-drop-title { font-size: 0.8125rem; font-weight: 400; color: var(--color-muted); }
+  .txcv-drop--compact .txcv-drop-sub { font-size: 0.8125rem; color: var(--color-muted); }
+
+  .txcv-drop-icon { color: var(--color-muted); margin-bottom: 0.5rem; }
+
+  .txcv-drop-title {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .txcv-drop-sub {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+
+  .txcv-drop-link {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    color: var(--color-fg);
+  }
+
+  .txcv-drop-formats {
+    margin-top: 0.5rem;
+    font-size: 0.6875rem;
+    color: var(--color-muted);
+    letter-spacing: 0.03em;
+  }
+
+  .txcv-input { display: none; }
+
+  /* ── Queue ── */
+  .txcv-queue {
+    margin: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .txcv-queue.hidden { display: none; }
+
+  .txcv-queue-item {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.625rem;
+    background: color-mix(in srgb, var(--color-fg) 2%, transparent);
+    transition: border-color 0.15s, opacity 0.2s;
+  }
+
+  .txcv-queue-item.txcv-qi--converting {
+    opacity: 0.6;
+    border-color: var(--color-muted);
+    animation: txcv-pulse 1s ease-in-out infinite;
+  }
+
+  .txcv-queue-item.txcv-qi--done { border-color: #22c55e55; }
+  .txcv-queue-item.txcv-qi--error { border-color: #ef444455; }
+
+  @keyframes txcv-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.35; }
+  }
+
+  .txcv-qi-thumb {
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: cover;
+    border-radius: 0.25rem;
+    flex-shrink: 0;
+    background: var(--color-border);
+  }
+
+  .txcv-qi-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .txcv-qi-name {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .txcv-qi-meta {
+    font-size: 0.6875rem;
+    color: var(--color-muted);
+  }
+
+  .txcv-qi-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-shrink: 0;
+  }
+
+  .txcv-qi-arrow { color: var(--color-muted); flex-shrink: 0; }
+
+  .txcv-qi-quality-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .txcv-qi-quality-wrap[data-visible="false"] { display: none; }
+
+  .txcv-qi-quality {
+    width: 5rem;
+    accent-color: var(--color-fg);
+    cursor: pointer;
+  }
+
+  .txcv-qi-quality-val {
+    font-size: 0.6875rem;
+    color: var(--color-muted);
+    min-width: 2.5rem;
+    text-align: right;
+  }
+
+  .txcv-qi-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--color-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .txcv-qi-remove:hover {
+    background: color-mix(in srgb, var(--color-fg) 10%, transparent);
+    color: var(--color-fg);
+  }
+
+  /* ── Action bar ── */
+  .txcv-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 1rem 1.5rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.625rem;
+    background: color-mix(in srgb, var(--color-fg) 2%, transparent);
+  }
+
+  .txcv-action-bar.hidden { display: none; }
+
+  .txcv-action-left,
+  .txcv-action-right {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .txcv-global-label {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  /* ── Buttons ── */
+  .txcv-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.4375rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    font-family: inherit;
+    border-radius: 0.4375rem;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-fg);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+    white-space: nowrap;
+  }
+
+  .txcv-btn:hover { background: color-mix(in srgb, var(--color-fg) 8%, transparent); }
+  .txcv-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .txcv-btn-primary {
+    background: var(--color-fg);
+    color: var(--color-bg);
+    border-color: var(--color-fg);
+  }
+
+  .txcv-btn-primary:hover { opacity: 0.85; background: var(--color-fg); }
+  .txcv-btn-primary:disabled { opacity: 0.5; }
+
+  .txcv-btn-ghost { color: var(--color-muted); }
+  .txcv-btn-ghost:hover { color: var(--color-fg); }
+
+  .txcv-btn-sm {
+    padding: 0.3125rem 0.625rem;
+    font-size: 0.75rem;
+    border-radius: 0.375rem;
+  }
+
+  .txcv-btn-cloud--done {
+    color: #22c55e;
+    border-color: #22c55e55;
+    pointer-events: none;
+  }
+
+  /* ── Select ── */
+  .txcv-select {
+    padding: 0.3125rem 0.625rem;
+    font-size: 0.8125rem;
+    font-family: inherit;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    appearance: auto;
+  }
+
+  /* ── Results ── */
+  .txcv-results {
+    margin: 0 1.5rem 1.5rem;
+  }
+
+  .txcv-results.hidden { display: none; }
+
+  .txcv-results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-top: 0.25rem;
+  }
+
+  .txcv-results-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .txcv-results-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .txcv-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.875rem;
+  }
+
+  .txcv-result-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: 0.625rem;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-fg) 2%, transparent);
+    transition: border-color 0.15s;
+  }
+
+  .txcv-result-card:hover { border-color: color-mix(in srgb, var(--color-fg) 40%, transparent); }
+
+  .txcv-rc-preview {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: var(--color-border);
+  }
+
+  .txcv-rc-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .txcv-rc-badge {
+    position: absolute;
+    top: 0.375rem;
+    right: 0.375rem;
+    background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+    backdrop-filter: blur(4px);
+    color: var(--color-fg);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--color-border);
+  }
+
+  .txcv-rc-info {
+    padding: 0.5rem 0.625rem 0.375rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .txcv-rc-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .txcv-rc-size {
+    font-size: 0.6875rem;
+    color: var(--color-muted);
+  }
+
+  .txcv-rc-actions {
+    display: flex;
+    gap: 0.375rem;
+    padding: 0.375rem 0.5rem 0.5rem;
+  }
+
+  .txcv-rc-actions .txcv-btn { flex: 1; justify-content: center; }
+
+  /* ── Toast ── */
+  .txcv-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    padding: 0.625rem 1.25rem;
+    background: var(--color-fg);
+    color: var(--color-bg);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: 2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 1000;
+    white-space: nowrap;
+  }
+
+  .txcv-toast--show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .txcv-toast--err {
+    background: #ef4444;
+    color: #fff;
+  }
+
+  /* ── Data panel ── */
+  .txcv-data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .txcv-tool-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 1.125rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.875rem;
+    background: color-mix(in srgb, var(--color-fg) 2%, transparent);
+  }
+
+  .txcv-tool-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-fg);
+  }
+
+  .txcv-tool-head svg { color: var(--color-muted); flex-shrink: 0; }
+
+  .txcv-textarea {
+    width: 100%;
+    min-height: 7rem;
+    padding: 0.625rem;
+    font-size: 0.75rem;
+    font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+    line-height: 1.5;
+  }
+
+  .txcv-textarea:focus { border-color: color-mix(in srgb, var(--color-fg) 50%, transparent); }
+  .txcv-textarea--error { border-color: #ef444488; color: #ef4444; }
+  .txcv-textarea-out { background: color-mix(in srgb, var(--color-fg) 3%, transparent); cursor: default; }
+
+  .txcv-tool-btns {
+    display: flex;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+  }
+
+  .txcv-b64-file-row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .txcv-b64-filename {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .txcv-drop { margin: 1rem; padding: 2rem 1rem; }
+    .txcv-queue { margin: 0 1rem; }
+    .txcv-action-bar { margin: 0.75rem 1rem; flex-direction: column; align-items: stretch; }
+    .txcv-action-left, .txcv-action-right { justify-content: space-between; }
+    .txcv-results { margin: 0 1rem 1rem; }
+    .txcv-data-grid { padding: 1rem; grid-template-columns: 1fr; }
+    .txcv-qi-quality { width: 3.5rem; }
+    .txcv-results-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  }
+</style>

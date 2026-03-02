@@ -36,6 +36,7 @@ White Mode:
 - `txfe` — TXFE Foto Editor Dokumentation
 - `txn` — TXN Notes App Dokumentation
 - `txp` — TXP Easter Egg Maskottchen
+- `txcv` — TXCV Konverter Dokumentation
 
 ## Arbeitsweise (WICHTIG)
 Arbeite immer nach den Claude Code Best Practices (https://code.claude.com/docs/en/best-practices):

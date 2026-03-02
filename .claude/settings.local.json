@@ -29,7 +29,8 @@
       "Bash(git push:*)",
       "WebFetch(domain:community.cloudflare.com)",
       "Bash(git:*)",
-      "WebFetch(domain:bugzilla.mozilla.org)"
+      "WebFetch(domain:bugzilla.mozilla.org)",
+      "mcp__plugin_github_github__get_commit"
     ]
   }
 }
