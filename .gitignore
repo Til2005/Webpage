@@ -24,3 +24,8 @@ Thumbs.db
 
 # accidentally created files
 nul
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
